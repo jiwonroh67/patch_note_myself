@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patch Note: Myself</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Noto+Sans+KR:wght@300;400&display=swap" rel="stylesheet">
+
+<style>
+/* =========================================================
+   Patch Note: Myself
+   작가: 노지원
+   조작: [1][2][3][4] 선택 / [Esc] 처음으로
+   ========================================================= */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: #000;
+  color: #fff;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 영문/숫자/기호는 JetBrains Mono */
+.mono { font-family: 'JetBrains Mono', monospace; font-weight: 400; }
+
+#game {
+  position: fixed;
+  inset: 0;
+  background-color: #000;
+  transition: background-color 0.3s ease-out;
+  overflow: hidden;
+}
+
+/* ============== INTRO ============== */
+#intro {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(28px, 6vw, 84px);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  color: #fff;
+}
+#intro::after {
+  content: '';
+  display: inline-block;
+  width: 0.55em;
+  height: 1em;
+  background: #fff;
+  margin-left: 0.1em;
+  vertical-align: -0.12em;
+  animation: blink 0.9s steps(1) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+#intro-subtitle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin-top: 70px;
+  font-size: clamp(13px, 1.4vw, 18px);
+  color: rgba(255,255,255,0.55);
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  opacity: 0;
+}
+#intro-subtitle.show {
+  animation: fadeIn 0.8s ease forwards;
+}
+
+#intro-hint {
+  position: absolute;
+  bottom: 12vh;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(11px, 1.1vw, 14px);
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.06em;
+  text-align: center;
+  line-height: 2;
+  opacity: 0;
+}
+#intro-hint.show {
+  animation: fadeIn 0.8s ease forwards;
+}
+@keyframes fadeIn { to { opacity: 1; } }
+
+/* ============== STAGE ============== */
+#stage {
+  position: absolute;
+  inset: 0;
+  padding: 4.5vh 5vw;
+  display: flex;
+  flex-direction: column;
+}
+
+.patch-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(18px, 2.2vw, 32px);
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  color: #fff;
+  margin-bottom: 1vh;
+}
+
+.day-counter {
+  position: absolute;
+  top: 4.8vh;
+  right: 5vw;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(11px, 1vw, 14px);
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.08em;
+  font-weight: 400;
+}
+
+.day-line {
+  font-size: clamp(18px, 2.6vw, 36px);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  margin-bottom: 4vh;
+  margin-top: 1.5vh;
+  color: #59FF31;
+  min-height: 1.5em;
+}
+
+.day-id {
+  font-family: 'JetBrains Mono', monospace;
+  margin-right: 0.4em;
+}
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6vh;
+  flex: 1;
+}
+
+.choice {
+  border: 1.5px solid #ffffff;
+  padding: 1.8vh 2vw;
+  font-size: clamp(16px, 2vw, 24px);
+  font-weight: 300;
+  color: #fff;
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  min-height: 7vh;
+  transition: transform 0.08s ease, border-color 0.15s ease, opacity 0.4s ease;
+  cursor: default;
+  opacity: 0;
+  pointer-events: none;
+}
+.choice.visible { opacity: 1; }
+.choice .num {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 400;
+  display: inline-block;
+  min-width: 2em;
+  margin-right: 0.8em;
+  color: rgba(255,255,255,0.45);
+  font-size: 0.85em;
+}
+.choice.pressed {
+  background: transparent;
+  border-color: #000;
+  color: #000;
+}
+.choice.pressed .num { color: #000; }
+
+/* 플래시 모드: 누적 색이 화면에 깔린 상태에서 텍스트는 흐릿하게 */
+#game.flash .choice { border-color: rgba(255,255,255,0.4); color: rgba(255,255,255,0.65); }
+#game.flash .choice.pressed {
+  background: transparent;
+  border-color: #000;
+  color: #000;
+}
+#game.flash .choice.pressed .num { color: #000; }
+#game.flash .day-line { opacity: 0.7; }
+#game.flash .patch-label { opacity: 0.6; }
+#game.flash .day-counter { opacity: 0.4; }
+
+/* 타이핑 커서 */
+.typing-cursor {
+  display: inline-block;
+  width: 0.5em;
+  height: 1em;
+  background: currentColor;
+  vertical-align: -0.1em;
+  margin-left: 2px;
+  animation: blink 0.9s steps(1) infinite;
+}
+
+/* ============== END (개인 결과) ============== */
+#end-screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2vh;
+  padding: 6vh 5vw;
+  background: #000; /* JS로 동적 변경 */
+  text-align: center;
+}
+
+.end-actions {
+  display: flex;
+  gap: 1.5vw;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn {
+  background: transparent;
+  border: 1.5px solid #fff;
+  color: #fff;
+  padding: 1.4vh 2.5vw;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: clamp(13px, 1.3vw, 17px);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+  min-width: 140px;
+}
+.btn:hover {
+  color: #59FF31;
+  border-color: #59FF31;
+}
+
+/* ============== ARCHIVE ============== */
+#archive-screen {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  padding: 4vh 5vw;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.archive-header {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(16px, 2vw, 26px);
+  letter-spacing: 0.03em;
+  margin-bottom: 1vh;
+  color: #fff;
+  font-weight: 400;
+}
+
+.archive-subtitle {
+  font-size: clamp(11px, 1.05vw, 14px);
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.04em;
+  margin-bottom: 3vh;
+  font-weight: 400;
+}
+
+#archive-bars {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  gap: 5px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 2vh;
+  padding-right: 2vw;
+}
+#archive-bars::-webkit-scrollbar { height: 6px; }
+#archive-bars::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+#archive-bars::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
+
+.archive-bar {
+  flex: 0 0 auto;
+  width: 18px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.archive-bar:hover { transform: scaleX(1.4); }
+
+@keyframes mineBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+.archive-bar.mine {
+  animation: mineBlink 1.4s ease-in-out infinite;
+}
+
+.archive-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 2vh;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  margin-top: 2vh;
+  flex-wrap: wrap;
+  gap: 1vh;
+}
+.archive-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(11px, 1.05vw, 14px);
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.03em;
+  font-weight: 400;
+}
+.archive-actions { display: flex; gap: 1vw; }
+
+/* ============== END LOG 영상 ============== */
+#endlog-screen {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  padding: 4vh 5vw;
+  display: flex;
+  flex-direction: column;
+  z-index: 150;
+  overflow: hidden;
+  cursor: pointer;
+}
+.endlog-header {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(13px, 1.3vw, 16px);
+  letter-spacing: 0.03em;
+  color: #fff;
+  margin-bottom: 3vh;
+  font-weight: 400;
+}
+.endlog-body {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(14px, 1.7vw, 22px);
+  line-height: 1.7;
+  color: rgba(255,255,255,0.85);
+  font-weight: 400;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  letter-spacing: 0.01em;
+}
+.endlog-line {
+  white-space: pre-wrap;
+  word-break: keep-all;
+  margin-bottom: 0.4em;
+  min-height: 1.2em;
+}
+.endlog-line.warning { color: #FFCC55; }
+.endlog-line.error   { color: #FF6464; }
+.endlog-line.fade-old { opacity: 0.5; transition: opacity 0.5s; }
+.endlog-line.fade-very-old { opacity: 0.2; transition: opacity 0.6s; }
+.endlog-skip {
+  position: absolute;
+  bottom: 3vh;
+  right: 5vw;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.04em;
+  opacity: 0;
+  animation: skipFadeIn 1s ease 8s forwards;
+}
+@keyframes skipFadeIn { to { opacity: 1; } }
+
+/* ============== README (작품 설명) ============== */
+#readme-screen {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  z-index: 200;
+}
+.readme-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 5vh 6vw 4vh;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+.readme-header {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(13px, 1.4vw, 17px);
+  letter-spacing: 0.03em;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 4vh;
+  font-weight: 400;
+}
+.readme-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(20px, 2.6vw, 34px);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: #fff;
+  margin-bottom: 0.4em;
+}
+.readme-author {
+  font-size: clamp(12px, 1.1vw, 14px);
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.04em;
+  margin-bottom: 4vh;
+  font-weight: 400;
+}
+.readme-body {
+  flex: 1;
+}
+.readme-body p {
+  font-size: clamp(14px, 1.3vw, 18px);
+  line-height: 1.95;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 1.6em;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+  text-align: justify;
+}
+.readme-actions {
+  display: flex;
+  gap: 1vw;
+  margin-top: 4vh;
+  padding-top: 3vh;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+/* ============== DETAIL (개별 기록) ============== */
+#detail-screen {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  padding: 4vh 5vw;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.detail-header {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(16px, 2vw, 26px);
+  letter-spacing: 0.03em;
+  margin-bottom: 3vh;
+  color: #fff;
+  font-weight: 400;
+}
+
+.detail-blended {
+  width: 100%;
+  height: 8vh;
+  margin-bottom: 3vh;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 6px;
+  margin-bottom: 3vh;
+}
+.detail-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.detail-color {
+  width: 100%;
+  aspect-ratio: 1;
+}
+.detail-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+  font-weight: 400;
+}
+
+.detail-actions {
+  margin-top: auto;
+  display: flex;
+  gap: 1vw;
+}
+
+.hidden { display: none !important; }
+
+/* 인트로 안내 — 모바일/PC 자동 분기 */
+.desktop-hint { display: inline; }
+.mobile-hint { display: none; }
+@media (max-width: 768px) {
+  .desktop-hint { display: none; }
+  .mobile-hint { display: inline; }
+}
+
+/* =========================================================
+   모바일 전용 레이아웃 (가로폭 768px 이하)
+   ========================================================= */
+@media (max-width: 768px) {
+
+  /* 인트로 */
+  #intro {
+    font-size: 28px;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.4;
+    width: 90vw;
+  }
+  #intro-subtitle {
+    margin-top: 60px;
+    font-size: 12px;
+    white-space: normal;
+    text-align: center;
+    width: 80vw;
+  }
+
+  /* 스테이지 */
+  #stage {
+    padding: 3vh 5vw;
+  }
+  .patch-label { font-size: 13px; margin-bottom: 0.5vh; }
+  .day-counter {
+    top: 3vh;
+    right: 5vw;
+    font-size: 10px;
+  }
+  .day-line {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 2.5vh;
+    margin-top: 2vh;
+  }
+
+  /* 선택지 — 모바일에서는 탭으로 선택 */
+  .choices { gap: 1.2vh; }
+  .choice {
+    padding: 1.6vh 4vw;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: auto;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  .choice:active {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.7);
+  }
+  .choice .num { display: none; }
+
+  /* 개인 결과 */
+  .end-actions {
+    flex-direction: column;
+    width: 75%;
+    gap: 1.5vh;
+  }
+  .btn {
+    width: 100%;
+    padding: 1.6vh 0;
+    font-size: 14px;
+    min-width: auto;
+  }
+
+  /* 아카이브 */
+  .archive-header { font-size: 14px; }
+  .archive-subtitle { font-size: 11px; margin-bottom: 2vh; }
+  .archive-bar { width: 8px; }
+  .archive-bar:hover { transform: none; }
+  .archive-bottom { flex-direction: column; align-items: flex-start; gap: 1.5vh; }
+  .archive-actions { width: 100%; display: flex; gap: 3vw; }
+  .archive-actions .btn { flex: 1; }
+
+  /* 상세 */
+  .detail-header { font-size: 13px; }
+  .detail-grid { grid-template-columns: repeat(5, 1fr); gap: 4px; }
+  .detail-label { font-size: 9px; }
+  .detail-blended { height: 6vh; }
+  .detail-actions { gap: 3vw; }
+  .detail-actions .btn { flex: 1; }
+
+  /* README */
+  .readme-inner { padding: 4vh 6vw 3vh; }
+  .readme-header { font-size: 12px; margin-bottom: 3vh; }
+  .readme-title { font-size: 19px; }
+  .readme-author { font-size: 11px; margin-bottom: 3vh; }
+  .readme-body p { font-size: 13px; line-height: 1.85; margin-bottom: 1.4em; }
+  .readme-actions { flex-direction: row; gap: 3vw; }
+  .readme-actions .btn { flex: 1; }
+}
+
+/* 모바일 키패드 (스테이지 화면에서만) */
+#mobile-keypad {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: none;
+  background: rgba(0,0,0,0.95);
+  padding: 1vh 2vw;
+  gap: 2vw;
+  border-top: 1px solid rgba(255,255,255,0.15);
+  z-index: 100;
+}
+#mobile-keypad.show { display: flex; }
+.keypad-btn {
+  flex: 1;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.4);
+  color: #fff;
+  padding: 1.5vh 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  cursor: pointer;
+}
+.keypad-btn:active { background: rgba(255,255,255,0.15); }
+
+@media (max-width: 768px) and (pointer: coarse) {
+  #stage { padding-bottom: 12vh; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- 배경 음악 (인트로 첫 클릭/키 입력부터 재생, loop 무한 반복) -->
+<audio id="bgm" src="sounds/bgm.mp3" loop preload="auto"></audio>
+
+<div id="game">
+
+  <!-- 1. INTRO -->
+  <div id="intro">patch_note &gt;&gt; myself</div>
+  <div id="intro-subtitle" class="hidden">30일, 당신의 패치를 기록합니다.</div>
+  <div id="intro-hint">
+    <span class="desktop-hint"><span class="mono">[1] [2] [3] [4]</span> 키로 선택<br>화면 클릭 또는 아무 키로 시작</span>
+    <span class="mobile-hint">선택지를 탭하여 진행<br>화면을 탭하여 시작</span>
+  </div>
+
+  <!-- 2. STAGE -->
+  <div id="stage" class="hidden">
+    <div class="patch-label">patch_note &gt;&gt; myself</div>
+    <div class="day-counter" id="day-counter">DAY 1 / 30</div>
+    <div class="day-line">
+      <span class="day-id" id="day-id"></span><span id="day-title"></span>
+    </div>
+    <div class="choices" id="choices"></div>
+  </div>
+
+  <!-- 3. END (개인 결과) -->
+  <div id="end-screen" class="hidden">
+    <div class="end-actions">
+      <button class="btn" id="btn-archive">모두의 기록 보기 &gt;</button>
+      <button class="btn" id="btn-restart-from-end">다시 시작</button>
+      <button class="btn" id="btn-readme-from-end">&gt;&gt; read_me</button>
+    </div>
+  </div>
+
+  <!-- 4. ARCHIVE -->
+  <div id="archive-screen" class="hidden">
+    <div class="archive-header">patch_note &gt;&gt; myself &gt;&gt; archive</div>
+    <div class="archive-subtitle">지금까지 이 게임을 거쳐간 모든 사람들의 기록 · 클릭하면 상세 보기</div>
+    <div id="archive-bars"></div>
+    <div class="archive-bottom">
+      <div class="archive-count"><span id="archive-count">0</span>명의 기록</div>
+      <div class="archive-actions">
+        <button class="btn" id="btn-back-to-end">&lt; 이전</button>
+        <button class="btn" id="btn-restart-from-archive">다시 시작</button>
+        <button class="btn" id="btn-readme-from-archive">&gt;&gt; read_me</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. DETAIL -->
+  <div id="detail-screen" class="hidden">
+    <div class="detail-header">patch_note &gt;&gt; archive &gt;&gt; your choices</div>
+    <div class="detail-blended" id="detail-blended"></div>
+    <div class="detail-grid" id="detail-grid"></div>
+    <div class="detail-actions">
+      <button class="btn" id="btn-back-to-archive">&lt; 아카이브로</button>
+    </div>
+  </div>
+
+  <!-- 5.5 END LOG 영상 -->
+  <div id="endlog-screen" class="hidden">
+    <div class="endlog-header">patch_note &gt;&gt; myself</div>
+    <div class="endlog-body" id="endlog-body"></div>
+    <div class="endlog-skip">
+      <span class="desktop-hint">[Space] 건너뛰기</span>
+      <span class="mobile-hint">화면 터치로 건너뛰기</span>
+    </div>
+  </div>
+
+  <!-- 6. README (작품 설명) -->
+  <div id="readme-screen" class="hidden">
+    <div class="readme-inner">
+      <div class="readme-header">patch_note &gt;&gt; read_me</div>
+      <h1 class="readme-title">Patch Note: Myself</h1>
+      <p class="readme-author">노지원</p>
+
+      <div class="readme-body">
+        <p>우리는 일상에서 '업데이트'나 '관리'와 같은 기술 용어로 자신의 상황을 설명한다. 감정, 관계, 심지어 자아마저 효율과 최적화를 중심으로 작동하며, 표현보다 즉각적인 수정이나 억제로 반응하도록 훈련된다. 한병철이 『피로사회』에서 지적하듯, 오늘날의 사회는 외부의 금지가 지배하는 규율사회가 아니라 "할 수 있음"을 끊임없이 요구하는 성과사회이며, 이 안에서 개인은 타인의 강제 없이도 스스로를 몰아붙이는 자기 착취의 주체가 된다.</p>
+
+        <p>이러한 환경에서 불안, 회피, 자기 검열은 더 이상 내면의 감각이 아니라 사회적 생존 전략이 된다. 감정은 기록되고 분류되며, 상처받지 않기 위한 최적의 방법을 모색한다. 감정이 데이터로 환원되는 순간 그것은 예측 가능해지지만 동시에 생명력을 잃는다. 일상의 작은 실패들은 '버그'로 분류되어 가능한 빠르게 수정해야 할 문제가 된다.</p>
+
+        <p>〈Patch Note: Myself〉는 이러한 감정의 파편들이 기록되고 갱신되는 과정을 인터랙티브 게임 형식으로 구성한다. 30개의 스테이지는 한 달간 하루 한 번씩 마주하는 스트레스 상황을 제시한다. 각 스테이지에서 관객은 네 가지 선택지 중 하나를 고른다. 'Bug Fix(버그 수정)'는 문제를 흔적 없이 삭제하지만 자기 부정의 얼굴을 가진다. 'Hotfix(긴급 수정)'는 하루를 간신히 버티게 해주는 임시 봉합이다. 'Feature(새로운 기능)'는 변화와 관계 회복이 가능한 시도이지만 실패와 충돌을 동반한다. 'Nerf(무력화)'는 자기 검열과 억제를 통해 스스로를 약화시킨다.</p>
+
+        <p>30번의 선택은 단일한 결말로 수렴하지 않는다. 같은 선택도 맥락과 경험에 따라 전혀 다른 의미로 작동하기에, 우리는 어떤 선택을 하더라도 그 결과를 예측할 수 없다. 관객은 매 스테이지를 통과하며 업데이트되는 듯한 체험을 하지만, 끝내 도달하는 것은 단일한 엔딩이 아닌 열린 결말이다. 삶은 결코 하나의 패치로 완결되지 않으며, 불확실성과 모순 속에서 끊임없이 다시 쓰이고 갱신된다. 불완전하고 불안한 삶일지라도 서로 지탱하면 단단하게 살 수 있다는 이야기를 전하고자 한다.</p>
+      </div>
+
+      <div class="readme-actions">
+        <button class="btn" id="btn-back-from-readme">&lt; 이전</button>
+        <button class="btn" id="btn-restart-from-readme">다시 시작</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모바일 키패드 -->
+  <div id="mobile-keypad">
+    <button class="keypad-btn" data-key="1">1</button>
+    <button class="keypad-btn" data-key="2">2</button>
+    <button class="keypad-btn" data-key="3">3</button>
+    <button class="keypad-btn" data-key="4">4</button>
+  </div>
+
+</div>
+
+<script type="module">
+/* =========================================================
+   FIREBASE — 모든 사람의 기록을 한 곳에 저장
+   ========================================================= */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDND6YI8g1rVWtE5Y-XPJfwrnUpLHkpy5Q",
+  authDomain: "patch-note-myself.firebaseapp.com",
+  projectId: "patch-note-myself",
+  storageBucket: "patch-note-myself.firebasestorage.app",
+  messagingSenderId: "979838634920",
+  appId: "1:979838634920:web:0d16ea4af39b2d1b542b9d"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
+const RECORDS_COLLECTION = collection(db, "plays");
+
+// ---- Firebase 저장/조회 함수 ----
+async function saveRecordToFirebase(record) {
+  try {
+    await addDoc(RECORDS_COLLECTION, {
+      ...record,
+      createdAt: serverTimestamp()
+    });
+    return true;
+  } catch (e) {
+    console.error("Firebase 저장 실패:", e);
+    return false;
+  }
+}
+
+async function loadRecordsFromFirebase() {
+  try {
+    const q = query(RECORDS_COLLECTION, orderBy("createdAt", "asc"));
+    const snapshot = await getDocs(q);
+    const records = [];
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      records.push({
+        sessionId: data.sessionId,
+        colors: data.colors,
+        blended: data.blended,
+        timestamp: data.timestamp || 0
+      });
+    });
+    return records;
+  } catch (e) {
+    console.error("Firebase 불러오기 실패:", e);
+    return [];
+  }
+}
+
+// 전역 노출 (기존 game.js 코드에서 호출 가능하게)
+window.__firebase = {
+  save: saveRecordToFirebase,
+  load: loadRecordsFromFirebase
+};
+</script>
+
+<script>
+/* =========================================================
+   GAME DATA — D1 ~ D30 (PDF 자료 그대로)
+   ========================================================= */
+const DAYS = [
+  { id:'D1',  title:'Critical Error: 화장실에서 울음', choices:[
+    { type:'BugFix',  text:'눈가 붉은 로그 삭제. 더 이상 오류 메세지 없음.' },
+    { type:'Hotfix',  text:'커피 + 플레이리스트 적용으로 임시 안정성 확보.' },
+    { type:'Feature', text:'meltdown 기록을 친구 채널과 공유.' },
+    { type:'Nerf',    text:'감정 표현 스탯이 대폭 약화됨.' }
+  ]},
+  { id:'D2',  title:'Unexpected Input: EX가 "보고싶어"라고 발송', choices:[
+    { type:'BugFix',  text:'알림 시스템 즉시 비활성화.' },
+    { type:'Hotfix',  text:'smiley face emoji 응답 발송.' },
+    { type:'Feature', text:'경계가 포함된 친절한 메세지 전송.' },
+    { type:'Nerf',    text:'감정 폭주로 메세지 서버 과부하 발생.' }
+  ]},
+  { id:'D3',  title:'System Lag: 잠들지 못 하는 새벽 3시', choices:[
+    { type:'BugFix',  text:'알림 비활성화 후, 짧은 영상 무한 스크롤 루프 진입.' },
+    { type:'Hotfix',  text:'허브티 + 호흡 앱으로 임시 안정 패치.' },
+    { type:'Feature', text:'짧은 반성 로그 작성 후 절전 모드 진입.' },
+    { type:'Nerf',    text:'생각 억제 알고리즘 적용으로 시스템 과열.' }
+  ]},
+  { id:'D4',  title:'Warning: 카드 잔액 부족', choices:[
+    { type:'BugFix',  text:'알림 비활성화 후, 결제 오류 로그 삭제.' },
+    { type:'Hotfix',  text:'친구에게 긴급 송금 요청.' },
+    { type:'Feature', text:'지출 추적 앱 설치 후 소비 기록 시작.' },
+    { type:'Nerf',    text:'자기 존재 결핍 자각, 가치 평가 수치 하락.' }
+  ]},
+  { id:'D5',  title:'Event: 단체 카톡방에서의 무응답', choices:[
+    { type:'BugFix',  text:'발신 메시지 삭제, 기록에서 제거됨.' },
+    { type:'Hotfix',  text:'MEME 추가 업로드로 채팅방 활성 시도.' },
+    { type:'Feature', text:'나와의 대화 채널에 한풀이 기능 추가.' },
+    { type:'Nerf',    text:'자기 비난 루프 로그가 과다 생성.' }
+  ]},
+  { id:'D6',  title:'Alert: 지하철에서 심장 두근거림', choices:[
+    { type:'BugFix',  text:'두 정거장 조기 하차 처리.' },
+    { type:'Hotfix',  text:'노이즈캔슬 + 심호흡 모듈 실행.' },
+    { type:'Feature', text:'불안 로그를 친구에게 실시간 전송.' },
+    { type:'Nerf',    text:'감정 데이터 억압. 억지 웃음 애니메이션 활성화.' }
+  ]},
+  { id:'D7',  title:'System Notification: 부모님 전화, 끝없는 질문', choices:[
+    { type:'BugFix',  text:'통화 요청 무시, "바빠요" 문자 자동 응답.' },
+    { type:'Hotfix',  text:'짧은 통화 후, 후속 대화 대면 예약 처리.' },
+    { type:'Feature', text:'경계 설정 대화 스크립트 실행.' },
+    { type:'Nerf',    text:'짜증 이벤트 발생, 후회 로그 생성.' }
+  ]},
+  { id:'D8',  title:'Error: 마감까지 24시간', choices:[
+    { type:'BugFix',  text:'프로젝트 범위 축소로 최소 요건만 유지.' },
+    { type:'Hotfix',  text:'체크리스트 기반 임시 제출 완료.' },
+    { type:'Feature', text:'외부 도움 요청 기능 활성화.' },
+    { type:'Nerf',    text:'미루기 루프 진입, 작업 모드 셧다운.' }
+  ]},
+  { id:'D9',  title:'DM Alert: 단체 사진에서 나만 빠짐', choices:[
+    { type:'BugFix',  text:'해당 사진 저장 안 함.' },
+    { type:'Hotfix',  text:'"ㅋㅋ 나 없네" 메시지 출력.' },
+    { type:'Feature', text:'차기 이벤트에서 직접 촬영 요청 기능 추가.' },
+    { type:'Nerf',    text:'서운함 로그가 내부 메모리에 무한 누적됨.' }
+  ]},
+  { id:'D10', title:'System Crash: 대화 도중 이름이 기억나지 않음', choices:[
+    { type:'BugFix',  text:'이름 언급을 피하고 문장을 우회 처리.' },
+    { type:'Hotfix',  text:'급히 자리를 벗어나며 상황을 일시 중단.' },
+    { type:'Feature', text:'솔직히 기억나지 않는다고 말하고 다시 물어봄.' },
+    { type:'Nerf',    text:'자기 능력 결핍 해석, 자기비난 루프에 진입.' }
+  ]},
+  { id:'D11', title:'File Not Found: 중요한 물건 분실', choices:[
+    { type:'BugFix',  text:'잃어버린 사실 기록 삭제.' },
+    { type:'Hotfix',  text:'임시 대체품 구매.' },
+    { type:'Feature', text:'해당 물건에 과도하게 의존하고 있었음이 뒤늦게 감지됨.' },
+    { type:'Nerf',    text:'자기 관리 실패 로그 누적.' }
+  ]},
+  { id:'D12', title:'Buffering: 오래 기다린 연락이 오지 않음', choices:[
+    { type:'BugFix',  text:'알림 삭제, 기대치 리셋.' },
+    { type:'Hotfix',  text:'메시지 선제 발송.' },
+    { type:'Feature', text:'다른 관계 채널 개설.' },
+    { type:'Nerf',    text:'무가치 로그 누적, 자존감 저하.' }
+  ]},
+  { id:'D13', title:'Critical Alert: 상사 앞에서 실수 적발', choices:[
+    { type:'BugFix',  text:'아무 일 없던 것처럼 로그 삭제.' },
+    { type:'Hotfix',  text:'빠른 사과 모듈 실행.' },
+    { type:'Feature', text:'당황, 수치심 감정 반응 임시 차단.' },
+    { type:'Nerf',    text:'자기 효용성 수치 급락.' }
+  ]},
+  { id:'D14', title:'Data Breach: 사적인 내용이 단체 채팅방에 잘못 전송', choices:[
+    { type:'BugFix',  text:'메시지 삭제 기능 즉시 실행.' },
+    { type:'Hotfix',  text:'해명 이모티콘 + "ㅋㅋ" 전송.' },
+    { type:'Feature', text:'진심 섞인 사과와 설명 발송.' },
+    { type:'Nerf',    text:'단체 채팅 알림 비활성화.' }
+  ]},
+  { id:'D15', title:'Deadline Overrun: 과제/업무 마감 직전 컴퓨터 블루스크린', choices:[
+    { type:'BugFix',  text:'기기 문제 무시하고 최소 보고.' },
+    { type:'Hotfix',  text:'긴급 복구 모드 실행.' },
+    { type:'Feature', text:'외부 도움 요청.' },
+    { type:'Nerf',    text:'책임 전가 불가 상태, 스트레스 과부하.' }
+  ]},
+  { id:'D16', title:'Unauthorized Access: 비밀로 하던 사실이 공개됨', choices:[
+    { type:'BugFix',  text:'관련 대화 차단.' },
+    { type:'Hotfix',  text:'즉석 변명 시나리오 실행.' },
+    { type:'Feature', text:'공개 사실을 받아들이고 새로운 서사 편입.' },
+    { type:'Nerf',    text:'수치심 로그 폭발적 증가.' }
+  ]},
+  { id:'D17', title:'Social Overload: 회식 자리 끝없는 술 권유', choices:[
+    { type:'BugFix',  text:'컵 비우기 애니메이션으로 상황 넘김.' },
+    { type:'Hotfix',  text:'속임수(물/음료 교체)로 즉시 대응.' },
+    { type:'Feature', text:'거절 스크립트 실행.' },
+    { type:'Nerf',    text:'순응 모드 진입, 자기 경계값 하락.' }
+  ]},
+  { id:'D18', title:'Conflict Error: 가까운 친구와 심한 언쟁', choices:[
+    { type:'BugFix',  text:'채팅방/연락 두절 모드 실행.' },
+    { type:'Hotfix',  text:'"미안" 단문 메시지 발송.' },
+    { type:'Feature', text:'대화 요청 및 화해 시도.' },
+    { type:'Nerf',    text:'관계 불안정성 로그가 메모리 점유.' }
+  ]},
+  { id:'D19', title:'Invalid Response: 과거의 상처를 솔직하게 말함', choices:[
+    { type:'BugFix',  text:'채팅 기록 즉시 삭제.' },
+    { type:'Hotfix',  text:'농담으로 상황 축소.' },
+    { type:'Feature', text:'감정을 솔직하게 공유.' },
+    { type:'Nerf',    text:'자존감 로그 붕괴, 자기비하 루프.' }
+  ]},
+  { id:'D20', title:'System Breakdown: 가족과의 심각한 갈등', choices:[
+    { type:'BugFix',  text:'대화 중단, 침묵 모드 유지.' },
+    { type:'Hotfix',  text:'표면적 화해 시뮬레이션 실행.' },
+    { type:'Feature', text:'진짜 감정 대화 시도.' },
+    { type:'Nerf',    text:'정체성 충돌로 내부 시스템 다운.' }
+  ]},
+  { id:'D21', title:'Exposure Error: 내 비밀 메시지/사진이 온라인에 퍼짐', choices:[
+    { type:'BugFix',  text:'해당 자료 삭제 시도, 기록 은폐.' },
+    { type:'Hotfix',  text:'"장난이었다" 해명 메시지로 임시 수습.' },
+    { type:'Feature', text:'상황을 솔직히 인정하고 새로운 맥락 제공.' },
+    { type:'Nerf',    text:'사생활 방화벽 완전 붕괴, 자존감 로그 하락.' }
+  ]},
+  { id:'D22', title:'Authority Clash: 상사에게 공개적으로 모욕당함', choices:[
+    { type:'BugFix',  text:'무반응 모드, 사건 로그 삭제.' },
+    { type:'Hotfix',  text:'억지 미소 출력, 즉각 상황 봉합.' },
+    { type:'Feature', text:'감정을 정리한 뒤 피드백 요청 대화 실행.' },
+    { type:'Nerf',    text:'자기 효용성 수치 폭락, 순응 모드 고착.' }
+  ]},
+  { id:'D23', title:'Network Failure: 가장 친한 친구에게 차단당함', choices:[
+    { type:'BugFix',  text:'대화 기록 완전 삭제, 알림 비활성화.' },
+    { type:'Hotfix',  text:'제3자를 통한 간접 연락 시도.' },
+    { type:'Feature', text:'새로운 관계 망 구축 프로세스 시작.' },
+    { type:'Nerf',    text:'신뢰도 로그 급락, 사회적 고립 루프 강화.' }
+  ]},
+  { id:'D24', title:'Public Humiliation: 많은 사람 앞에서 모욕적인 발언을 듣는 순간', choices:[
+    { type:'BugFix',  text:'기억 로그 삭제, 표정 비활성화.' },
+    { type:'Hotfix',  text:'억지 웃음 출력으로 상황 봉합.' },
+    { type:'Feature', text:'모욕 경험을 언어화하여 항의 발언 실행.' },
+    { type:'Nerf',    text:'수치심 과부하, 자기 존재 지표 붕괴.' }
+  ]},
+  { id:'D25', title:'Network Blackout: SNS 계정 해킹으로 모든 기록이 삭제됨', choices:[
+    { type:'BugFix',  text:'계정 복구 시도 기록 은폐.' },
+    { type:'Hotfix',  text:'임시 새 계정 생성.' },
+    { type:'Feature', text:'데이터 손실을 계기로 새로운 정체성 구축.' },
+    { type:'Nerf',    text:'정체성 기반 붕괴, 사회적 연결 단절.' }
+  ]},
+  { id:'D26', title:'Rejection Storm: 동시에 세 곳 이상의 지원에서 탈락 통보 수신', choices:[
+    { type:'BugFix',  text:'메일 삭제, 알림 로그 제거.' },
+    { type:'Hotfix',  text:'"괜찮아, 다음 기회" 자동 자기 위로 실행.' },
+    { type:'Feature', text:'탈락 원인을 분석해 전략 수정.' },
+    { type:'Nerf',    text:'자기 효용성 수치 급락, 무가치 루프 진입.' }
+  ]},
+  { id:'D27', title:'Betrayal Error: 가장 믿었던 사람이 내 비밀을 누설', choices:[
+    { type:'BugFix',  text:'관련 기록 삭제, 대화 차단.' },
+    { type:'Hotfix',  text:'배신자에게 즉각 메시지 전송.' },
+    { type:'Feature', text:'배신 경험을 새로운 관계 서사로 전환.' },
+    { type:'Nerf',    text:'신뢰 알고리즘 붕괴, 자기혐오 강화.' }
+  ]},
+  { id:'D28', title:'Health Crash: 갑작스러운 공황 발작, 호흡 불능', choices:[
+    { type:'BugFix',  text:'증상 부인, 사건 로그 삭제.' },
+    { type:'Hotfix',  text:'심호흡·진정제 투여로 임시 봉합.' },
+    { type:'Feature', text:'치료·상담을 통한 장기적 시스템 업데이트.' },
+    { type:'Nerf',    text:'신체 시스템 신뢰도 붕괴, 무력화 루프 진입.' }
+  ]},
+  { id:'D29', title:'Terminal Error: 중요한 사람 앞에서 돌이킬 수 없는 말 발화', choices:[
+    { type:'BugFix',  text:'대화 기록 삭제, 발화 은폐.' },
+    { type:'Hotfix',  text:'농담으로 포장.' },
+    { type:'Feature', text:'솔직히 사과하고 관계 재협상 시도.' },
+    { type:'Nerf',    text:'후회 로그 무한 반복, 자기 존재 가치 급락.' }
+  ]},
+  { id:'D30', title:'Final Crash: 가장 가까운 사람의 죽음을 목격', choices:[
+    { type:'BugFix',  text:'기억 억제, 장면 삭제 시도.' },
+    { type:'Hotfix',  text:'현실 회피 루틴 실행.' },
+    { type:'Feature', text:'질문 자체를 시스템 핵심 업데이트로 채택, 삶의 방향성을 재설계.' },
+    { type:'Nerf',    text:'감정 엔진 붕괴, 삶의 동력 로그 소실.' }
+  ]},
+  { id:'D?', title:'Existential Error: "내가 왜 여기 있는가"라는 질문에서 탈출 불가', choices:[
+    { type:'BugFix',  text:'철학적 질문 루프 무시, 일상 태스크로 복귀.' },
+    { type:'Hotfix',  text:'자기 합리화 서브루틴 실행.' },
+    { type:'Feature', text:'질문 자체를 시스템 핵심 업데이트로 채택, 삶의 방향성을 재설계.' },
+    { type:'Nerf',    text:'자기 존재 알고리즘 무한 루프, 정체성 충돌 심화.' }
+  ]},
+  { id:'D?', title:'Identity Breakdown: "너는 누구냐"라는 질문에 아무 대답도 불가', choices:[
+    { type:'BugFix',  text:'자기소개 요청 무응답 처리.' },
+    { type:'Hotfix',  text:'준비된 단어 몇 개로 간신히 응답.' },
+    { type:'Feature', text:'자아 혼란 자체를 탐구 모드로 전환.' },
+    { type:'Nerf',    text:'자아 알고리즘 충돌, 시스템 다운.' }
+  ]},
+  { id:'D?', title:'Critical Error: 화장실에서 울음', choices:[
+    { type:'BugFix',  text:'눈가 붉은 로그 삭제. 더 이상 오류 메세지 없음.' },
+    { type:'Hotfix',  text:'커피 + 플레이리스트 적용으로 임시 안정성 확보.' },
+    { type:'Feature', text:'meltdown 기록을 친구 채널과 공유.' },
+    { type:'Nerf',    text:'감정 표현 스탯이 대폭 약화됨.' }
+  ]}
+];
+
+const COLORS = {
+  BugFix:  '#9B9B9B',
+  Hotfix:  '#FFFF00',
+  Feature: '#59FF31',
+  Nerf:    '#FF0000'
+};
+
+const TIMING = {
+  TYPE_INTRO: 130,       // 인트로 글자당 타이핑 속도 (조금 더 천천히)
+  INTRO_HOLD: 1500,      // 인트로 끝 대기
+  TYPE_TITLE: 45,        // 스테이지 제목 타이핑 속도
+  TYPE_CHOICE: 18,       // 선택지 타이핑 속도
+  CHOICE_DELAY: 600,     // 선택지 사이 등장 딜레이 (한 호흡)
+  FLASH_DURATION: 1000   // 플래시 1초
+};
+
+/* =========================================================
+   AUDIO — 배경음악
+   ========================================================= */
+const $bgm = document.getElementById('bgm');
+$bgm.volume = 0.7;
+let bgmStarted = false;
+
+function startBgm() {
+  if (bgmStarted) return;
+  // 브라우저 자동재생 정책: 첫 사용자 입력 후에만 재생 가능
+  const playPromise = $bgm.play();
+  if (playPromise !== undefined) {
+    playPromise.then(() => {
+      bgmStarted = true;
+    }).catch(() => {
+      // 재생 실패 시 다음 입력에서 다시 시도
+      bgmStarted = false;
+    });
+  }
+}
+
+/* =========================================================
+   STATE
+   ========================================================= */
+let phase = 'INTRO';
+let currentDay = 0;
+let currentChoiceOrder = [];
+let chosenColors = [];
+let acceptingInput = false;
+let mySessionId = null;
+
+// 진행 중인 모든 타이머를 추적해서 스테이지 전환 시 정리
+let activeTimers = [];
+function clearAllTimers() {
+  activeTimers.forEach(t => {
+    clearInterval(t);
+    clearTimeout(t);
+  });
+  activeTimers = [];
+}
+function trackTimer(timer) {
+  activeTimers.push(timer);
+  return timer;
+}
+
+const $game     = document.getElementById('game');
+const $intro    = document.getElementById('intro');
+const $introSubtitle = document.getElementById('intro-subtitle');
+const $introHint= document.getElementById('intro-hint');
+const $stage    = document.getElementById('stage');
+const $dayId    = document.getElementById('day-id');
+const $dayTitle = document.getElementById('day-title');
+const $dayCounter = document.getElementById('day-counter');
+const $choices  = document.getElementById('choices');
+const $end      = document.getElementById('end-screen');
+const $archive  = document.getElementById('archive-screen');
+const $archiveBars = document.getElementById('archive-bars');
+const $archiveCount = document.getElementById('archive-count');
+const $detail   = document.getElementById('detail-screen');
+const $detailBlended = document.getElementById('detail-blended');
+const $detailGrid = document.getElementById('detail-grid');
+const $readme   = document.getElementById('readme-screen');
+const $endlog   = document.getElementById('endlog-screen');
+const $endlogBody = document.getElementById('endlog-body');
+const $keypad = document.getElementById('mobile-keypad');
+
+// README 화면에서 '이전' 버튼이 어디로 돌아갈지 기억
+let readmeReturnTarget = 'END'; // 'END' or 'ARCHIVE'
+
+/* =========================================================
+   STORAGE — Firebase + 로컬 백업
+   ========================================================= */
+const STORAGE_KEY = 'patch_note_records';
+
+// 로컬 백업 (오프라인에서도 본인 기록은 보임)
+function loadLocalRecords() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch(e) { return []; }
+}
+
+function saveLocalRecord(record) {
+  const records = loadLocalRecords();
+  records.push(record);
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+  } catch(e) {}
+}
+
+// Firebase + 로컬 모두에 저장
+async function saveRecord(record) {
+  saveLocalRecord(record); // 즉시 로컬 백업
+  if (window.__firebase) {
+    await window.__firebase.save(record); // Firebase 저장 (비동기)
+  }
+}
+
+// Firebase에서 모든 기록 불러오기 (실패 시 로컬 fallback)
+async function loadRecords() {
+  if (window.__firebase) {
+    const remote = await window.__firebase.load();
+    if (remote && remote.length > 0) {
+      return remote;
+    }
+  }
+  return loadLocalRecords();
+}
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function hexToRgb(hex) {
+  const h = hex.replace('#', '');
+  return {
+    r: parseInt(h.substr(0, 2), 16),
+    g: parseInt(h.substr(2, 2), 16),
+    b: parseInt(h.substr(4, 2), 16)
+  };
+}
+
+function blendColors(hexList) {
+  if (hexList.length === 0) return 'rgb(0,0,0)';
+  let r = 0, g = 0, b = 0;
+  hexList.forEach(h => {
+    const c = hexToRgb(h);
+    r += c.r; g += c.g; b += c.b;
+  });
+  const n = hexList.length;
+  return `rgb(${Math.round(r/n)}, ${Math.round(g/n)}, ${Math.round(b/n)})`;
+}
+
+function generateSessionId() {
+  return 's_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+}
+
+function showOnly(screen) {
+  [$intro, $introSubtitle, $introHint, $stage, $end, $archive, $detail, $readme].forEach(el => el.classList.add('hidden'));
+  $keypad.classList.remove('show');
+  if (screen === 'INTRO') {
+    $intro.classList.remove('hidden');
+  } else if (screen === 'STAGE') {
+    $stage.classList.remove('hidden');
+  } else if (screen === 'END') {
+    $end.classList.remove('hidden');
+  } else if (screen === 'ARCHIVE') {
+    $archive.classList.remove('hidden');
+  } else if (screen === 'DETAIL') {
+    $detail.classList.remove('hidden');
+  } else if (screen === 'README') {
+    $readme.classList.remove('hidden');
+  }
+}
+
+/* =========================================================
+   1. INTRO
+   ========================================================= */
+function startIntro() {
+  // 진행 중이던 모든 타이머 정리 (Esc로 중간에 처음으로 돌아올 때 등)
+  clearAllTimers();
+  cleanupEndLog();
+
+  phase = 'INTRO';
+  chosenColors = [];
+  currentDay = 0;
+  mySessionId = null;
+  acceptingInput = false;
+
+  showOnly('INTRO');
+  $game.classList.remove('flash');
+  $game.style.backgroundColor = '#000';
+  $end.style.backgroundColor = '#000';
+  $introHint.classList.remove('show');
+  $introSubtitle.classList.remove('show');
+  $introSubtitle.classList.remove('hidden');
+
+  const fullText = 'patch_note >> myself';
+  $intro.textContent = '';
+
+  let i = 0;
+  const typer = setInterval(() => {
+    i++;
+    $intro.textContent = fullText.substring(0, i);
+    if (i >= fullText.length) {
+      clearInterval(typer);
+      // 타이틀 타이핑 끝난 직후 부제 페이드인
+      trackTimer(setTimeout(() => $introSubtitle.classList.add('show'), 300));
+      $introHint.classList.remove('hidden');
+      trackTimer(setTimeout(() => $introHint.classList.add('show'), 800));
+      acceptingInput = true;
+      phase = 'INTRO_READY';
+    }
+  }, TIMING.TYPE_INTRO);
+  trackTimer(typer);
+}
+
+/* =========================================================
+   2. STAGE
+   ========================================================= */
+function showStage(idx) {
+  // 진행 중이던 모든 타이머 정리 (이전 스테이지 잔재 제거)
+  clearAllTimers();
+
+  phase = 'STAGE_TYPING';
+  currentDay = idx;
+  acceptingInput = false;
+
+  $game.classList.remove('flash');
+  $game.style.backgroundColor = '#000';
+  showOnly('STAGE');
+
+  // 이전 스테이지의 선택지를 비움 (새 제목 타이핑 직전)
+  $choices.innerHTML = '';
+
+  const day = DAYS[idx];
+  // D? 스테이지는 카운터를 다르게 표시 (특별 엔딩 느낌)
+  if (day.id === 'D?') {
+    $dayCounter.textContent = '???';
+  } else {
+    $dayCounter.textContent = `DAY ${idx + 1} / 30`;
+  }
+
+  // 제목 타이핑
+  $dayId.textContent = `<${day.id}>`;
+  $dayTitle.textContent = '';
+  const titleText = ' ' + day.title;
+  let ti = 0;
+  const titleTyper = setInterval(() => {
+    ti++;
+    $dayTitle.textContent = titleText.substring(0, ti);
+    if (ti >= titleText.length) {
+      clearInterval(titleTyper);
+      buildChoices();
+    }
+  }, TIMING.TYPE_TITLE);
+  trackTimer(titleTyper);
+}
+
+function buildChoices() {
+  currentChoiceOrder = shuffle([0, 1, 2, 3]);
+  $choices.innerHTML = '';
+
+  currentChoiceOrder.forEach((origIdx, displayIdx) => {
+    const day = DAYS[currentDay];
+    const ch = day.choices[origIdx];
+    const div = document.createElement('div');
+    div.className = 'choice';
+    div.dataset.index = displayIdx;
+    div.innerHTML = `<span class="num">[${displayIdx + 1}]</span><span class="choice-text"></span>`;
+    $choices.appendChild(div);
+  });
+
+  // 선택지 순차 등장
+  let displayIdx = 0;
+  function typeNextChoice() {
+    if (displayIdx >= 4) {
+      phase = 'STAGE';
+      acceptingInput = true;
+      return;
+    }
+    const el = $choices.children[displayIdx];
+    const origIdx = currentChoiceOrder[displayIdx];
+    const text = DAYS[currentDay].choices[origIdx].text;
+    const $textSpan = el.querySelector('.choice-text');
+    el.classList.add('visible');
+
+    let ci = 0;
+    const charTyper = setInterval(() => {
+      ci++;
+      $textSpan.textContent = text.substring(0, ci);
+      if (ci >= text.length) {
+        clearInterval(charTyper);
+        displayIdx++;
+        trackTimer(setTimeout(typeNextChoice, TIMING.CHOICE_DELAY));
+      }
+    }, TIMING.TYPE_CHOICE);
+    trackTimer(charTyper);
+  }
+  typeNextChoice();
+}
+
+/* =========================================================
+   3. FLASH
+   ========================================================= */
+function selectChoice(displayIdx) {
+  if (!acceptingInput || phase !== 'STAGE') return;
+  if (displayIdx < 0 || displayIdx > 3) return;
+
+  acceptingInput = false;
+  phase = 'FLASH';
+
+  const el = $choices.children[displayIdx];
+  if (el) el.classList.add('pressed');
+
+  const day = DAYS[currentDay];
+  const origIdx = currentChoiceOrder[displayIdx];
+  const choice = day.choices[origIdx];
+  const hex = COLORS[choice.type];
+
+  chosenColors.push(hex);
+
+  // 플래시: 선택한 단일 색 (선택지 텍스트는 그대로 유지)
+  $game.style.backgroundColor = hex;
+  $game.classList.add('flash');
+
+  // 다음 스테이지로 이동 (D30 → D31일 때만 색 시퀀스 연출 삽입)
+  trackTimer(setTimeout(() => {
+    const nextDay = currentDay + 1;
+    if (nextDay < DAYS.length) {
+      // D30 → D31(첫 D?)로 넘어가는 순간이면 특별 연출
+      if (currentDay === 29 && DAYS[nextDay].id === 'D?') {
+        playDQuestionSequence(() => showStage(nextDay));
+      } else {
+        showStage(nextDay);
+      }
+    } else {
+      // 모든 스테이지 끝 → End Log → 결과
+      playEndLog(() => showEnd());
+    }
+  }, TIMING.FLASH_DURATION));
+}
+
+/* =========================================================
+   D? 등장 연출
+   - 4가지 색이 순서대로 0.25초씩 (Bug Fix → Hotfix → Feature → Nerf)
+   - 그 후 랜덤 색이 2초마다 5번
+   - 그 후 콜백 실행 (D31 시작)
+   ========================================================= */
+function playDQuestionSequence(onComplete) {
+  phase = 'D_QUESTION_INTRO';
+  acceptingInput = false;
+
+  // 화면의 모든 텍스트 비우기
+  $stage.classList.add('hidden');
+  $game.classList.remove('flash');
+
+  const orderedColors = [
+    COLORS.BugFix,
+    COLORS.Hotfix,
+    COLORS.Feature,
+    COLORS.Nerf
+  ];
+  const colorPool = Object.values(COLORS);
+
+  let step = 0;
+
+  // 1단계: 4색 순서대로 0.25초씩
+  function playOrdered() {
+    if (step < orderedColors.length) {
+      $game.style.backgroundColor = orderedColors[step];
+      step++;
+      trackTimer(setTimeout(playOrdered, 250));
+    } else {
+      // 2단계로 전환
+      step = 0;
+      playRandom();
+    }
+  }
+
+  // 2단계: 랜덤 색 2초씩 5번
+  function playRandom() {
+    if (step < 5) {
+      const randomColor = colorPool[Math.floor(Math.random() * colorPool.length)];
+      $game.style.backgroundColor = randomColor;
+      step++;
+      trackTimer(setTimeout(playRandom, 2000));
+    } else {
+      // 끝 — 검은 화면으로 돌아가서 D31 시작
+      $game.style.backgroundColor = '#000';
+      trackTimer(setTimeout(onComplete, 400));
+    }
+  }
+
+  playOrdered();
+}
+
+/* =========================================================
+   End Log 영상 — PDF 23페이지 1안 그대로
+   ========================================================= */
+const END_LOG_LINES = [
+  { time:'00:00:03', text:'system.out.println("끝났다고 생각했지만, 사실 아직 시작도 하지 않았다");' },
+  { time:'00:00:06', text:'log.info("모든 선택은 잠정적이다. 결과는 닫히지 않고 흘러간다");' },
+  { time:'00:00:09', text:'debug.trace("누군가에겐 Bug Fix가, 또 다른 누군가에겐 Nerf가 된다");' },
+  { time:'00:00:12', text:'system.out.println("나는 고쳤다고 믿었는데, 당신은 상처라고 느낄 수 있다");' },
+  { time:'00:00:15', text:'warning: 게임은 종료되었지만, 삶의 패치는 계속된다', cls:'warning' },
+  { time:'00:00:18', text:'update.check("결과는 확정이 아니라, 또 다른 선택의 서막이다");' },
+  { time:'00:00:22', text:'patch.log("Bug Fix, Hotfix, Feature, Nerf… 어떤 이름을 붙여도 결국 열린 가능성일 뿐이다");' },
+  { time:'00:00:26', text:'system.out.println("엔딩 크레딧은 흘러가지만, 내일의 로그는 이미 작성 중이다");' },
+  { time:'00:00:30', text:'error: 결국, 좋음과 나쁨은 끝나지 않는 업데이트처럼 겹쳐진다', cls:'error' },
+  { time:'00:00:34', text:'reboot.sequence("다시 시작할 수 없다 해도, 이미 또 다른 시작 속에 있다");' },
+  { time:'00:00:37', text:'log.info("선택은 저장되었지만, 결과는 여전히 미결 상태다");' },
+  { time:'00:00:40', text:'system.out.println("모든 갈래는 동시에 열려 있다");' },
+  { time:'00:00:44', text:'debug.trace("확정된 결말은 없다. 오직 임시 저장뿐이다");' },
+  { time:'00:00:47', text:'update.check("패치 이후에도 버그는 다른 모습으로 남아 있다");' },
+  { time:'00:00:50', text:'warning: 예상치 못한 입력값이 감지됨 — 삶은 계속된다', cls:'warning' },
+  { time:'00:00:53', text:'system.out.println("이기는 것도 패배하는 것도 단지 로그의 한 줄이다");' },
+  { time:'00:00:56', text:'error: 해답 없음. 단지 또 다른 질문만 남음', cls:'error' },
+  { time:'00:01:00', text:'patch.log("Hotfix는 안정성을 주었지만, 동시에 균열도 만들었다");' },
+  { time:'00:01:04', text:'system.out.println("삶은 실행 중이다. 중단 명령어는 없다");' }
+];
+
+let endLogActive = false;
+let endLogSkipHandler = null;
+
+function playEndLog(onComplete) {
+  phase = 'END_LOG';
+  acceptingInput = false;
+  endLogActive = true;
+
+  // 무대 정리
+  $stage.classList.add('hidden');
+  $game.classList.remove('flash');
+  $game.style.backgroundColor = '#000';
+  $endlogBody.innerHTML = '';
+  $endlog.classList.remove('hidden');
+
+  const TYPE_SPEED = 35;          // 글자 타이핑 속도 (ms)
+  const LOOP_GAP = 2000;          // 한 사이클 끝난 후 다음 사이클까지 (ms)
+  const MAX_VISIBLE_LINES = 14;   // 화면에 동시에 보일 수 있는 최대 줄 수
+
+  // "00:00:03" 형식 → 초로 변환
+  function timeToSeconds(t) {
+    const parts = t.split(':').map(Number);
+    return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  }
+
+  // 초 → "00:00:03" 형식으로 변환
+  function secondsToTime(s) {
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  }
+
+  // 사이클이 거듭될수록 누적되는 시간 오프셋 (초)
+  let timeOffset = 0;
+
+  function finish() {
+    cleanupEndLog();
+    onComplete();
+  }
+
+  // ===== 스킵 처리 =====
+  endLogSkipHandler = (e) => {
+    if (!endLogActive) return;
+    if (e.key === ' ' || e.code === 'Space') {
+      e.preventDefault();
+      e.stopPropagation();
+      clearAllTimers();
+      finish();
+    }
+  };
+  document.addEventListener('keydown', endLogSkipHandler, true);
+
+  endLogClickHandler = (e) => {
+    if (!endLogActive) return;
+    e.preventDefault();
+    e.stopPropagation();
+    clearAllTimers();
+    finish();
+  };
+  $endlog.addEventListener('click', endLogClickHandler, true);
+
+  // ===== 한 줄 타이핑 출력 =====
+  function typeLineNow(line, displayTime) {
+    if (!endLogActive) return;
+    const fullText = `[${displayTime}] ${line.text}`;
+
+    const div = document.createElement('div');
+    div.className = 'endlog-line' + (line.cls ? ' ' + line.cls : '');
+    $endlogBody.appendChild(div);
+
+    // 화면 가득 차면 위쪽 줄들을 흐리게 + 너무 많아지면 제거
+    const allLines = $endlogBody.querySelectorAll('.endlog-line');
+    if (allLines.length > MAX_VISIBLE_LINES) {
+      const fadeStart = allLines.length - MAX_VISIBLE_LINES;
+      for (let i = 0; i < fadeStart; i++) {
+        allLines[i].classList.add('fade-very-old');
+      }
+      if (allLines.length > MAX_VISIBLE_LINES + 10) {
+        allLines[0].remove();
+      }
+    }
+
+    // 한 글자씩 타이핑
+    let charIdx = 0;
+    const charTyper = setInterval(() => {
+      if (!endLogActive) {
+        clearInterval(charTyper);
+        return;
+      }
+      charIdx++;
+      div.textContent = fullText.substring(0, charIdx);
+      $endlogBody.scrollTop = $endlogBody.scrollHeight;
+      if (charIdx >= fullText.length) {
+        clearInterval(charTyper);
+      }
+    }, TYPE_SPEED);
+    trackTimer(charTyper);
+  }
+
+  // ===== 한 사이클 재생 (시간에 맞춰 줄들을 스케줄링) =====
+  function playCycle() {
+    if (!endLogActive) return;
+
+    const firstSec = timeToSeconds(END_LOG_LINES[0].time);
+    const lastSec = timeToSeconds(END_LOG_LINES[END_LOG_LINES.length - 1].time);
+    const cycleSpan = lastSec - firstSec;
+
+    // 이번 사이클의 모든 줄을 스케줄링
+    END_LOG_LINES.forEach(line => {
+      const lineSec = timeToSeconds(line.time);
+      const offsetMs = (lineSec - firstSec) * 1000;     // 사이클 내 시작 시점
+      const displaySec = lineSec + timeOffset;           // 누적 시간으로 표시
+      const displayTime = secondsToTime(displaySec);
+
+      trackTimer(setTimeout(() => typeLineNow(line, displayTime), offsetMs));
+    });
+
+    // 다음 사이클 준비: 누적 시간 갱신 (마지막 줄 시간 + LOOP_GAP)
+    timeOffset += cycleSpan + Math.floor(LOOP_GAP / 1000);
+
+    // 다음 사이클 시작 (무한 반복)
+    const cycleDuration = cycleSpan * 1000 + LOOP_GAP;
+    trackTimer(setTimeout(playCycle, cycleDuration));
+  }
+
+  playCycle();
+}
+
+let endLogClickHandler = null;
+
+function cleanupEndLog() {
+  if (endLogSkipHandler) {
+    document.removeEventListener('keydown', endLogSkipHandler, true);
+    endLogSkipHandler = null;
+  }
+  if (endLogClickHandler) {
+    $endlog.removeEventListener('click', endLogClickHandler, true);
+    endLogClickHandler = null;
+  }
+  endLogActive = false;
+  $endlog.classList.add('hidden');
+}
+
+/* =========================================================
+   4. END (개인 결과)
+   ========================================================= */
+function showEnd() {
+  phase = 'END';
+  acceptingInput = false;
+
+  const blended = blendColors(chosenColors);
+  $end.style.backgroundColor = blended;
+  showOnly('END');
+
+  // 기록 저장
+  if (!mySessionId) {
+    mySessionId = generateSessionId();
+    saveRecord({
+      sessionId: mySessionId,
+      colors: chosenColors.slice(),
+      blended: blended,
+      timestamp: Date.now()
+    });
+  }
+}
+
+/* =========================================================
+   5. ARCHIVE
+   ========================================================= */
+async function showArchive() {
+  phase = 'ARCHIVE';
+  showOnly('ARCHIVE');
+
+  // 로딩 상태 표시
+  $archiveCount.textContent = '...';
+  $archiveBars.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-size:13px;padding:2vh;font-family:\'JetBrains Mono\',monospace;">기록을 불러오는 중...</div>';
+
+  const records = await loadRecords();
+
+  $archiveBars.innerHTML = '';
+  $archiveCount.textContent = records.length.toLocaleString();
+
+  // 시간순 (오래된 게 왼쪽, 최근이 오른쪽)
+  records.forEach(rec => {
+    const bar = document.createElement('div');
+    bar.className = 'archive-bar';
+    if (rec.sessionId === mySessionId) bar.classList.add('mine');
+    bar.style.backgroundColor = rec.blended;
+    bar.dataset.sessionId = rec.sessionId;
+    bar.addEventListener('click', () => showDetail(rec));
+    $archiveBars.appendChild(bar);
+  });
+
+  // 본인 기록으로 자동 스크롤
+  if (mySessionId) {
+    const mine = $archiveBars.querySelector('.archive-bar.mine');
+    if (mine) {
+      setTimeout(() => mine.scrollIntoView({ behavior: 'smooth', inline: 'center' }), 100);
+    }
+  }
+}
+
+/* =========================================================
+   6. DETAIL
+   ========================================================= */
+function showDetail(record) {
+  phase = 'DETAIL';
+  showOnly('DETAIL');
+
+  $detailBlended.style.backgroundColor = record.blended;
+  $detailGrid.innerHTML = '';
+
+  record.colors.forEach((color, idx) => {
+    const cell = document.createElement('div');
+    cell.className = 'detail-cell';
+    // 31~33번째는 D?로 표시
+    const label = idx < 30 ? `D${idx + 1}` : 'D?';
+    cell.innerHTML = `
+      <div class="detail-color" style="background-color: ${color}"></div>
+      <div class="detail-label">${label}</div>
+    `;
+    $detailGrid.appendChild(cell);
+  });
+}
+
+/* =========================================================
+   7. README (작품 설명)
+   ========================================================= */
+function showReadme(returnTarget) {
+  phase = 'README';
+  readmeReturnTarget = returnTarget; // 'END' or 'ARCHIVE'
+  showOnly('README');
+  // 스크롤을 최상단으로
+  $readme.scrollTop = 0;
+}
+
+function backFromReadme() {
+  if (readmeReturnTarget === 'ARCHIVE') {
+    showArchive();
+  } else {
+    showEnd();
+  }
+}
+
+/* =========================================================
+   INPUT
+   ========================================================= */
+document.addEventListener('keydown', (e) => {
+  // 첫 입력 시 음악 재생 시도
+  startBgm();
+
+  // ===== 개발/테스트용 단축키 =====
+  // E 키: 30번 선택을 자동으로 채워서 바로 결과 페이지로 이동
+  if (e.key === 'e' || e.key === 'E') {
+    chosenColors = [];
+    const colorTypes = ['BugFix', 'Hotfix', 'Feature', 'Nerf'];
+    for (let i = 0; i < DAYS.length; i++) {
+      const randomType = colorTypes[Math.floor(Math.random() * 4)];
+      chosenColors.push(COLORS[randomType]);
+    }
+    currentDay = DAYS.length - 1;
+    showEnd();
+    return;
+  }
+  // Q 키: D? 등장 연출만 미리보기 (4색 순차 → 랜덤 5번)
+  if (e.key === 'q' || e.key === 'Q') {
+    clearAllTimers();
+    cleanupEndLog();
+    $stage.classList.add('hidden');
+    $end.classList.add('hidden');
+    $archive.classList.add('hidden');
+    $detail.classList.add('hidden');
+    $readme.classList.add('hidden');
+    $intro.classList.add('hidden');
+    $introSubtitle.classList.add('hidden');
+    $introHint.classList.add('hidden');
+    playDQuestionSequence(() => {
+      // 연출 끝나면 인트로로 복귀
+      startIntro();
+    });
+    return;
+  }
+  // L 키: End Log 영상만 미리보기
+  if (e.key === 'l' || e.key === 'L') {
+    clearAllTimers();
+    cleanupEndLog();
+    $stage.classList.add('hidden');
+    $end.classList.add('hidden');
+    $archive.classList.add('hidden');
+    $detail.classList.add('hidden');
+    $readme.classList.add('hidden');
+    $intro.classList.add('hidden');
+    $introSubtitle.classList.add('hidden');
+    $introHint.classList.add('hidden');
+    playEndLog(() => startIntro());
+    return;
+  }
+  // ===== 단축키 끝 =====
+
+  if (phase === 'INTRO_READY') {
+    showStage(0);
+    return;
+  }
+  if (phase === 'STAGE') {
+    if (['1', '2', '3', '4'].includes(e.key)) {
+      e.preventDefault();
+      selectChoice(parseInt(e.key) - 1);
+    }
+  }
+  if (e.key === 'Escape') {
+    startIntro();
+  }
+});
+
+// 인트로 화면에서 어디든 클릭하면 시작 (PC + 모바일 공통)
+document.addEventListener('click', (e) => {
+  startBgm();
+  if (phase === 'INTRO_READY') {
+    showStage(0);
+  }
+});
+
+// 선택지 탭/클릭 — 모바일(터치 기기)에서만 활성화
+// PC는 키보드 [1][2][3][4]만 사용
+function isMobile() {
+  return window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 768;
+}
+
+$choices.addEventListener('click', (e) => {
+  if (!isMobile()) return;
+  const target = e.target.closest('.choice');
+  if (target && phase === 'STAGE') {
+    selectChoice(parseInt(target.dataset.index));
+  }
+});
+
+// 모바일 키패드 (현재 사용 안 함 — 호환용으로 유지)
+$keypad.addEventListener('click', (e) => {
+  const btn = e.target.closest('.keypad-btn');
+  if (btn && phase === 'STAGE') {
+    selectChoice(parseInt(btn.dataset.key) - 1);
+  }
+});
+
+// 버튼들
+document.getElementById('btn-archive').addEventListener('click', showArchive);
+document.getElementById('btn-restart-from-end').addEventListener('click', startIntro);
+document.getElementById('btn-back-to-end').addEventListener('click', showEnd);
+document.getElementById('btn-restart-from-archive').addEventListener('click', startIntro);
+document.getElementById('btn-back-to-archive').addEventListener('click', showArchive);
+
+// README 화면 진입/이탈
+document.getElementById('btn-readme-from-end').addEventListener('click', () => showReadme('END'));
+document.getElementById('btn-readme-from-archive').addEventListener('click', () => showReadme('ARCHIVE'));
+document.getElementById('btn-back-from-readme').addEventListener('click', backFromReadme);
+document.getElementById('btn-restart-from-readme').addEventListener('click', startIntro);
+
+/* =========================================================
+   START
+   ========================================================= */
+startIntro();
+</script>
+
+</body>
+</html>
