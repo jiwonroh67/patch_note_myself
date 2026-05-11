@@ -800,179 +800,185 @@ window.__firebase = {
    GAME DATA — D1 ~ D30 (PDF 자료 그대로)
    ========================================================= */
 const DAYS = [
+  // D1 — 유지
   { id:'D1',  title:'Critical Error: 화장실에서 울음', choices:[
     { type:'BugFix',  text:'눈가 붉은 로그 삭제. 더 이상 오류 메세지 없음.' },
     { type:'Hotfix',  text:'커피 + 플레이리스트 적용으로 임시 안정성 확보.' },
     { type:'Feature', text:'meltdown 기록을 친구 채널과 공유.' },
     { type:'Nerf',    text:'감정 표현 스탯이 대폭 약화됨.' }
   ]},
-  { id:'D2',  title:'Unexpected Input: EX가 "보고싶어"라고 발송', choices:[
-    { type:'BugFix',  text:'알림 시스템 즉시 비활성화.' },
-    { type:'Hotfix',  text:'smiley face emoji 응답 발송.' },
-    { type:'Feature', text:'경계가 포함된 친절한 메세지 전송.' },
-    { type:'Nerf',    text:'감정 폭주로 메세지 서버 과부하 발생.' }
+  // D2~D9 — 일상의 잔잔한 균열
+  { id:'D2',  title:'Bug Report: 거울 속 표정이 낯섦', choices:[
+    { type:'BugFix',  text:'거울을 지나치며 시야 캐시 비우기.' },
+    { type:'Hotfix',  text:'입꼬리 올리는 표정으로 출근용 페르소나 로드.' },
+    { type:'Feature', text:'지금 표정의 의미를 메모장에 기록.' },
+    { type:'Nerf',    text:'"원래 내 얼굴이 이랬나" 자기 인식 오류 누적.' }
   ]},
-  { id:'D3',  title:'System Lag: 잠들지 못 하는 새벽 3시', choices:[
-    { type:'BugFix',  text:'알림 비활성화 후, 짧은 영상 무한 스크롤 루프 진입.' },
-    { type:'Hotfix',  text:'허브티 + 호흡 앱으로 임시 안정 패치.' },
-    { type:'Feature', text:'짧은 반성 로그 작성 후 절전 모드 진입.' },
-    { type:'Nerf',    text:'생각 억제 알고리즘 적용으로 시스템 과열.' }
+  { id:'D3',  title:'Memory Leak: 어제의 대화가 자꾸 재생됨', choices:[
+    { type:'BugFix',  text:'관련 채팅창 알림 완전 차단.' },
+    { type:'Hotfix',  text:'음악 볼륨을 높여 생각 프로세스 일시 정지.' },
+    { type:'Feature', text:'재생되는 장면을 글로 옮겨 의미 분석.' },
+    { type:'Nerf',    text:'"내가 왜 그렇게 말했지" 무한 재실행 진입.' }
   ]},
-  { id:'D4',  title:'Warning: 카드 잔액 부족', choices:[
-    { type:'BugFix',  text:'알림 비활성화 후, 결제 오류 로그 삭제.' },
-    { type:'Hotfix',  text:'친구에게 긴급 송금 요청.' },
-    { type:'Feature', text:'지출 추적 앱 설치 후 소비 기록 시작.' },
-    { type:'Nerf',    text:'자기 존재 결핍 자각, 가치 평가 수치 하락.' }
+  { id:'D4',  title:'Sync Error: 친구의 SNS만 화려해 보임', choices:[
+    { type:'BugFix',  text:'피드 새로고침 중단, 앱 강제 종료.' },
+    { type:'Hotfix',  text:'내 SNS에 보정된 사진 한 장 업로드.' },
+    { type:'Feature', text:'친구에게 "잘 지내?" 안부 메시지 발송.' },
+    { type:'Nerf',    text:'비교 알고리즘이 자기 평가 수치 잠식.' }
   ]},
-  { id:'D5',  title:'Event: 단체 카톡방에서의 무응답', choices:[
-    { type:'BugFix',  text:'발신 메시지 삭제, 기록에서 제거됨.' },
-    { type:'Hotfix',  text:'MEME 추가 업로드로 채팅방 활성 시도.' },
-    { type:'Feature', text:'나와의 대화 채널에 한풀이 기능 추가.' },
-    { type:'Nerf',    text:'자기 비난 루프 로그가 과다 생성.' }
+  { id:'D5',  title:'Idle State: 약속 없는 주말', choices:[
+    { type:'BugFix',  text:'낮잠으로 시간 점프 실행.' },
+    { type:'Hotfix',  text:'카페로 이동, 노트북 앞에 자리 잡기.' },
+    { type:'Feature', text:'오랫동안 미뤘던 작업 파일 열어보기.' },
+    { type:'Nerf',    text:'"나만 외로운 것 같다" 고립 인식 강화.' }
   ]},
-  { id:'D6',  title:'Alert: 지하철에서 심장 두근거림', choices:[
-    { type:'BugFix',  text:'두 정거장 조기 하차 처리.' },
-    { type:'Hotfix',  text:'노이즈캔슬 + 심호흡 모듈 실행.' },
-    { type:'Feature', text:'불안 로그를 친구에게 실시간 전송.' },
-    { type:'Nerf',    text:'감정 데이터 억압. 억지 웃음 애니메이션 활성화.' }
+  { id:'D6',  title:'Idle Process: 아침에 일어났는데 일어날 이유가 없음', choices:[
+    { type:'BugFix',  text:'이불 속에서 핸드폰만 보다가 다시 잠들기.' },
+    { type:'Hotfix',  text:'카페인으로 강제 부팅, "일단 씻기만 하자".' },
+    { type:'Feature', text:'왜 무기력한지 물어보고 한 가지 작은 일부터 시작.' },
+    { type:'Nerf',    text:'"이런 식으로 살면 안 되는데" 자기 비난 누적.' }
   ]},
-  { id:'D7',  title:'System Notification: 부모님 전화, 끝없는 질문', choices:[
-    { type:'BugFix',  text:'통화 요청 무시, "바빠요" 문자 자동 응답.' },
-    { type:'Hotfix',  text:'짧은 통화 후, 후속 대화 대면 예약 처리.' },
-    { type:'Feature', text:'경계 설정 대화 스크립트 실행.' },
-    { type:'Nerf',    text:'짜증 이벤트 발생, 후회 로그 생성.' }
+  { id:'D7',  title:'Cache Overflow: 단톡방에서 내 메시지에만 답이 없음', choices:[
+    { type:'BugFix',  text:'보낸 메시지 조용히 삭제.' },
+    { type:'Hotfix',  text:'"ㅎㅎ 다들 바쁘네" 한 줄 더 보내 분위기 풀기 시도.' },
+    { type:'Feature', text:'가까운 사람에게 개인 메시지로 안부 묻기.' },
+    { type:'Nerf',    text:'"내가 분위기를 깬 건가" 발신 기록 무한 재검토.' }
   ]},
-  { id:'D8',  title:'Error: 마감까지 24시간', choices:[
-    { type:'BugFix',  text:'프로젝트 범위 축소로 최소 요건만 유지.' },
-    { type:'Hotfix',  text:'체크리스트 기반 임시 제출 완료.' },
-    { type:'Feature', text:'외부 도움 요청 기능 활성화.' },
-    { type:'Nerf',    text:'미루기 루프 진입, 작업 모드 셧다운.' }
+  { id:'D8',  title:'Update Required: 작업이 손에 잡히지 않음', choices:[
+    { type:'BugFix',  text:'작업창 닫고 다른 영상 재생.' },
+    { type:'Hotfix',  text:'커피 한 잔과 15분 타이머로 강제 부팅.' },
+    { type:'Feature', text:'오늘은 안 되는 날이라 인정하고 산책 나가기.' },
+    { type:'Nerf',    text:'"이것도 못 하다니" 자기 효용성 평가절하.' }
   ]},
-  { id:'D9',  title:'DM Alert: 단체 사진에서 나만 빠짐', choices:[
-    { type:'BugFix',  text:'해당 사진 저장 안 함.' },
-    { type:'Hotfix',  text:'"ㅋㅋ 나 없네" 메시지 출력.' },
-    { type:'Feature', text:'차기 이벤트에서 직접 촬영 요청 기능 추가.' },
-    { type:'Nerf',    text:'서운함 로그가 내부 메모리에 무한 누적됨.' }
+  { id:'D9',  title:'Network Timeout: 답장이 하루 넘게 오지 않음', choices:[
+    { type:'BugFix',  text:'대화창 알림 끄고 시야에서 제거.' },
+    { type:'Hotfix',  text:'"바쁘구나ㅎㅎ" 가벼운 후속 메시지 발송.' },
+    { type:'Feature', text:'"답장 기다리는 게 좀 불안해" 솔직히 전달.' },
+    { type:'Nerf',    text:'"내가 뭐 잘못 보냈나" 발신 기록 무한 검토.' }
   ]},
-  { id:'D10', title:'System Crash: 대화 도중 이름이 기억나지 않음', choices:[
-    { type:'BugFix',  text:'이름 언급을 피하고 문장을 우회 처리.' },
-    { type:'Hotfix',  text:'급히 자리를 벗어나며 상황을 일시 중단.' },
-    { type:'Feature', text:'솔직히 기억나지 않는다고 말하고 다시 물어봄.' },
-    { type:'Nerf',    text:'자기 능력 결핍 해석, 자기비난 루프에 진입.' }
+  // D10~D17 — 관계와 사회적 압박
+  { id:'D10', title:'Resource Conflict: 친구의 부탁을 거절해야 함', choices:[
+    { type:'BugFix',  text:'답을 미루며 시간이 지나 자동 거절 처리.' },
+    { type:'Hotfix',  text:'"한 번만이야"라며 결국 수락.' },
+    { type:'Feature', text:'"이번엔 어려울 것 같아, 미안" 솔직히 거절.' },
+    { type:'Nerf',    text:'거절 못 한 자신을 며칠 동안 책망.' }
   ]},
-  { id:'D11', title:'File Not Found: 중요한 물건 분실', choices:[
-    { type:'BugFix',  text:'잃어버린 사실 기록 삭제.' },
-    { type:'Hotfix',  text:'임시 대체품 구매.' },
-    { type:'Feature', text:'해당 물건에 과도하게 의존하고 있었음이 뒤늦게 감지됨.' },
-    { type:'Nerf',    text:'자기 관리 실패 로그 누적.' }
+  { id:'D11', title:'Permission Denied: 가족 모임에 가기 싫음', choices:[
+    { type:'BugFix',  text:'"몸이 안 좋다"는 메시지로 불참 통보.' },
+    { type:'Hotfix',  text:'잠깐 얼굴만 비추고 일찍 일어나기.' },
+    { type:'Feature', text:'왜 부담스러운지 가까운 가족 한 명에게 털어놓기.' },
+    { type:'Nerf',    text:'가기 싫다는 마음 자체를 죄책감으로 변환.' }
   ]},
-  { id:'D12', title:'Buffering: 오래 기다린 연락이 오지 않음', choices:[
-    { type:'BugFix',  text:'알림 삭제, 기대치 리셋.' },
-    { type:'Hotfix',  text:'메시지 선제 발송.' },
-    { type:'Feature', text:'다른 관계 채널 개설.' },
-    { type:'Nerf',    text:'무가치 로그 누적, 자존감 저하.' }
+  { id:'D12', title:'Deprecated Function: 오랜 친구와 할 말이 없음', choices:[
+    { type:'BugFix',  text:'약속 시간 조정으로 만남 무기한 연기.' },
+    { type:'Hotfix',  text:'날씨, 음식 얘기로 가벼운 대화 채우기.' },
+    { type:'Feature', text:'"우리 요즘 좀 멀어진 것 같다" 화제 꺼내기.' },
+    { type:'Nerf',    text:'"내가 재미없어진 거다" 자기 가치 절하.' }
   ]},
-  { id:'D13', title:'Critical Alert: 상사 앞에서 실수 적발', choices:[
-    { type:'BugFix',  text:'아무 일 없던 것처럼 로그 삭제.' },
-    { type:'Hotfix',  text:'빠른 사과 모듈 실행.' },
-    { type:'Feature', text:'당황, 수치심 감정 반응 임시 차단.' },
-    { type:'Nerf',    text:'자기 효용성 수치 급락.' }
+  { id:'D13', title:'Forced Update: 회사에서 야근 강요', choices:[
+    { type:'BugFix',  text:'말없이 가방 챙겨 정시 퇴근.' },
+    { type:'Hotfix',  text:'한 시간만 더 하고 가겠다고 절충.' },
+    { type:'Feature', text:'"오늘은 어렵습니다"라고 정중히 거절.' },
+    { type:'Nerf',    text:'"내가 부족해서다"라며 자정까지 남기.' }
   ]},
-  { id:'D14', title:'Data Breach: 사적인 내용이 단체 채팅방에 잘못 전송', choices:[
-    { type:'BugFix',  text:'메시지 삭제 기능 즉시 실행.' },
-    { type:'Hotfix',  text:'해명 이모티콘 + "ㅋㅋ" 전송.' },
-    { type:'Feature', text:'진심 섞인 사과와 설명 발송.' },
-    { type:'Nerf',    text:'단체 채팅 알림 비활성화.' }
+  { id:'D14', title:'Stack Overflow: 해야 할 일이 너무 많아짐', choices:[
+    { type:'BugFix',  text:'목록을 안 보고 자버리기.' },
+    { type:'Hotfix',  text:'가장 작은 일 하나만 처리하고 미루기.' },
+    { type:'Feature', text:'우선순위 다시 정리하고 도움 요청.' },
+    { type:'Nerf',    text:'"왜 나는 이 정도도 못 하지" 자기 비난 누적.' }
   ]},
-  { id:'D15', title:'Deadline Overrun: 과제/업무 마감 직전 컴퓨터 블루스크린', choices:[
-    { type:'BugFix',  text:'기기 문제 무시하고 최소 보고.' },
-    { type:'Hotfix',  text:'긴급 복구 모드 실행.' },
-    { type:'Feature', text:'외부 도움 요청.' },
-    { type:'Nerf',    text:'책임 전가 불가 상태, 스트레스 과부하.' }
+  { id:'D15', title:'Sync Drift: 타인들과 시간의 속도가 다르게 느껴짐', choices:[
+    { type:'BugFix',  text:'동창 연락처, SNS 일괄 정리.' },
+    { type:'Hotfix',  text:'일정표를 빽빽이 채워 뒤처짐 감각 무력화.' },
+    { type:'Feature', text:'내 속도를 인정하고 지금 할 수 있는 일에 집중.' },
+    { type:'Nerf',    text:'"이 나이에 이 정도라니" 자기 시간 가치 폄하.' }
   ]},
-  { id:'D16', title:'Unauthorized Access: 비밀로 하던 사실이 공개됨', choices:[
-    { type:'BugFix',  text:'관련 대화 차단.' },
-    { type:'Hotfix',  text:'즉석 변명 시나리오 실행.' },
-    { type:'Feature', text:'공개 사실을 받아들이고 새로운 서사 편입.' },
-    { type:'Nerf',    text:'수치심 로그 폭발적 증가.' }
+  { id:'D16', title:'Token Mismatch: 모임에서 내 진짜 의견을 못 꺼내고 돌아옴', choices:[
+    { type:'BugFix',  text:'못한 말 자체를 없던 일로 처리.' },
+    { type:'Hotfix',  text:'"원래 나는 말 많은 타입 아니야" 자기 합리화 실행.' },
+    { type:'Feature', text:'못한 말을 따로 정리해 다음 자리에서 시도.' },
+    { type:'Nerf',    text:'"나는 늘 이 모양이다" 자기 표현 능력 평가절하.' }
   ]},
-  { id:'D17', title:'Social Overload: 회식 자리 끝없는 술 권유', choices:[
-    { type:'BugFix',  text:'컵 비우기 애니메이션으로 상황 넘김.' },
-    { type:'Hotfix',  text:'속임수(물/음료 교체)로 즉시 대응.' },
-    { type:'Feature', text:'거절 스크립트 실행.' },
-    { type:'Nerf',    text:'순응 모드 진입, 자기 경계값 하락.' }
+  { id:'D17', title:'Read-only Mode: 부모님이 또 같은 잔소리를 함', choices:[
+    { type:'BugFix',  text:'"네 네"로 대답하며 머릿속 음소거.' },
+    { type:'Hotfix',  text:'농담으로 받아치며 분위기 누그러뜨리기.' },
+    { type:'Feature', text:'"그 말 들으면 좀 힘들어요" 차분히 표현.' },
+    { type:'Nerf',    text:'말 안 통하는 자신에 대한 무력감 누적.' }
   ]},
-  { id:'D18', title:'Conflict Error: 가까운 친구와 심한 언쟁', choices:[
-    { type:'BugFix',  text:'채팅방/연락 두절 모드 실행.' },
-    { type:'Hotfix',  text:'"미안" 단문 메시지 발송.' },
-    { type:'Feature', text:'대화 요청 및 화해 시도.' },
-    { type:'Nerf',    text:'관계 불안정성 로그가 메모리 점유.' }
+  // D18~D20 — 깊은 균열
+  { id:'D18', title:'Process Killed: 연인과의 이별', choices:[
+    { type:'BugFix',  text:'관련 사진/대화 일괄 삭제, 흔적 제거.' },
+    { type:'Hotfix',  text:'친구들 불러 술 한 잔으로 하루 버티기.' },
+    { type:'Feature', text:'울고 싶을 만큼 울고, 천천히 다음 페이지로.' },
+    { type:'Nerf',    text:'"내가 부족해서다" 책임 100% 자기 할당.' }
   ]},
-  { id:'D19', title:'Invalid Response: 과거의 상처를 솔직하게 말함', choices:[
-    { type:'BugFix',  text:'채팅 기록 즉시 삭제.' },
-    { type:'Hotfix',  text:'농담으로 상황 축소.' },
-    { type:'Feature', text:'감정을 솔직하게 공유.' },
-    { type:'Nerf',    text:'자존감 로그 붕괴, 자기비하 루프.' }
+  { id:'D19', title:'Fatal Exception: 가까운 사람에게 큰소리를 침', choices:[
+    { type:'BugFix',  text:'"미안 그냥 잊어줘" 한 줄로 사건 종결 시도.' },
+    { type:'Hotfix',  text:'선물이나 호의로 분위기 회복 시도.' },
+    { type:'Feature', text:'왜 그 말이 나왔는지 솔직히 설명하고 사과.' },
+    { type:'Nerf',    text:'"역시 나는 사람과 못 어울린다" 일반화 진행.' }
   ]},
-  { id:'D20', title:'System Breakdown: 가족과의 심각한 갈등', choices:[
-    { type:'BugFix',  text:'대화 중단, 침묵 모드 유지.' },
-    { type:'Hotfix',  text:'표면적 화해 시뮬레이션 실행.' },
-    { type:'Feature', text:'진짜 감정 대화 시도.' },
-    { type:'Nerf',    text:'정체성 충돌로 내부 시스템 다운.' }
+  { id:'D20', title:'Access Violation: 직장에서 부당한 일을 시킴', choices:[
+    { type:'BugFix',  text:'문제 제기 없이 시키는 대로 처리.' },
+    { type:'Hotfix',  text:'"이번만요"라는 단서를 달고 수용.' },
+    { type:'Feature', text:'왜 부적절한지 정리해 정식으로 의견 제출.' },
+    { type:'Nerf',    text:'"이런 데서 일하는 내가 한심하다" 자기 격하.' }
   ]},
-  { id:'D21', title:'Exposure Error: 내 비밀 메시지/사진이 온라인에 퍼짐', choices:[
-    { type:'BugFix',  text:'해당 자료 삭제 시도, 기록 은폐.' },
-    { type:'Hotfix',  text:'"장난이었다" 해명 메시지로 임시 수습.' },
-    { type:'Feature', text:'상황을 솔직히 인정하고 새로운 맥락 제공.' },
-    { type:'Nerf',    text:'사생활 방화벽 완전 붕괴, 자존감 로그 하락.' }
+  // D21~D24 — 트라우마 후유증 4일 연속
+  { id:'D21', title:'Database Corruption: 오래된 트라우마가 떠오름', choices:[
+    { type:'BugFix',  text:'기억 영역 강제 종료, 다른 일에 몰두.' },
+    { type:'Hotfix',  text:'술이나 음식으로 감각 압도시키기.' },
+    { type:'Feature', text:'상담 예약 또는 신뢰하는 사람과 대화.' },
+    { type:'Nerf',    text:'"아직도 이걸로 흔들리는 내가 한심하다" 자기 처벌.' }
   ]},
-  { id:'D22', title:'Authority Clash: 상사에게 공개적으로 모욕당함', choices:[
-    { type:'BugFix',  text:'무반응 모드, 사건 로그 삭제.' },
-    { type:'Hotfix',  text:'억지 미소 출력, 즉각 상황 봉합.' },
-    { type:'Feature', text:'감정을 정리한 뒤 피드백 요청 대화 실행.' },
-    { type:'Nerf',    text:'자기 효용성 수치 폭락, 순응 모드 고착.' }
+  { id:'D22', title:'Memory Fragment: 비슷한 장소·소리에서 갑자기 몸이 굳음', choices:[
+    { type:'BugFix',  text:'해당 장소/상황 자동 회피 경로 설정.' },
+    { type:'Hotfix',  text:'음악, 카페인, 익숙한 행동으로 감각 덮기.' },
+    { type:'Feature', text:'왜 지금 이 반응이 나오는지 차분히 관찰.' },
+    { type:'Nerf',    text:'"아직도 이런 반응이라니" 자기 회복력 평가절하.' }
   ]},
-  { id:'D23', title:'Network Failure: 가장 친한 친구에게 차단당함', choices:[
-    { type:'BugFix',  text:'대화 기록 완전 삭제, 알림 비활성화.' },
-    { type:'Hotfix',  text:'제3자를 통한 간접 연락 시도.' },
-    { type:'Feature', text:'새로운 관계 망 구축 프로세스 시작.' },
-    { type:'Nerf',    text:'신뢰도 로그 급락, 사회적 고립 루프 강화.' }
+  { id:'D23', title:'Trust Module Error: 새로 가까워진 사람을 자꾸 의심하게 됨', choices:[
+    { type:'BugFix',  text:'거리 두기, 약속 취소로 관계 진입 차단.' },
+    { type:'Hotfix',  text:'아무 일 없는 듯 행동, 의심 신호 숨기기.' },
+    { type:'Feature', text:'"예전 일 때문에 내가 좀 예민해" 솔직히 공유.' },
+    { type:'Nerf',    text:'"결국 또 다칠 것" 관계 자체 회의 누적.' }
   ]},
-  { id:'D24', title:'Public Humiliation: 많은 사람 앞에서 모욕적인 발언을 듣는 순간', choices:[
-    { type:'BugFix',  text:'기억 로그 삭제, 표정 비활성화.' },
-    { type:'Hotfix',  text:'억지 웃음 출력으로 상황 봉합.' },
-    { type:'Feature', text:'모욕 경험을 언어화하여 항의 발언 실행.' },
-    { type:'Nerf',    text:'수치심 과부하, 자기 존재 지표 붕괴.' }
+  { id:'D24', title:'Patch Rollback: 좀 나아진 줄 알았는데 다시 처음으로 돌아간 느낌', choices:[
+    { type:'BugFix',  text:'무뎌질 때까지 영상, 게임 등으로 시간 채우기.' },
+    { type:'Hotfix',  text:'"원래 회복은 오래 걸리는 거" 자기 위로 실행.' },
+    { type:'Feature', text:'신뢰하는 사람에게 "다시 안 좋다"고 솔직히 말하기.' },
+    { type:'Nerf',    text:'"결국 평생 이렇게 살 것" 회복 가능성 차단.' }
   ]},
-  { id:'D25', title:'Network Blackout: SNS 계정 해킹으로 모든 기록이 삭제됨', choices:[
-    { type:'BugFix',  text:'계정 복구 시도 기록 은폐.' },
-    { type:'Hotfix',  text:'임시 새 계정 생성.' },
-    { type:'Feature', text:'데이터 손실을 계기로 새로운 정체성 구축.' },
-    { type:'Nerf',    text:'정체성 기반 붕괴, 사회적 연결 단절.' }
+  // D25~D30 — 극한
+  { id:'D25', title:'Kernel Panic: 공황 발작', choices:[
+    { type:'BugFix',  text:'아무 일 없던 척 자리 벗어나기.' },
+    { type:'Hotfix',  text:'심호흡, 찬물, 익숙한 음악으로 응급 진정.' },
+    { type:'Feature', text:'전문가에게 도움 요청, 치료 시작.' },
+    { type:'Nerf',    text:'"이런 내가 정상이 아니다" 자기 진단 격하.' }
   ]},
-  { id:'D26', title:'Rejection Storm: 동시에 세 곳 이상의 지원에서 탈락 통보 수신', choices:[
-    { type:'BugFix',  text:'메일 삭제, 알림 로그 제거.' },
-    { type:'Hotfix',  text:'"괜찮아, 다음 기회" 자동 자기 위로 실행.' },
-    { type:'Feature', text:'탈락 원인을 분석해 전략 수정.' },
-    { type:'Nerf',    text:'자기 효용성 수치 급락, 무가치 루프 진입.' }
+  { id:'D26', title:'Memory Wipe: 일상이 의미를 잃어가는 게 느껴짐', choices:[
+    { type:'BugFix',  text:'하루 일과를 기계적으로 수행, 감정 회로 차단.' },
+    { type:'Hotfix',  text:'새 옷, 새 헤어, 새 환경으로 자극 주입.' },
+    { type:'Feature', text:'"나에게 무엇이 필요한지" 시간을 들여 다시 묻기.' },
+    { type:'Nerf',    text:'의미 자체에 대한 회의 누적, 일상 정지 단계 진입.' }
   ]},
-  { id:'D27', title:'Betrayal Error: 가장 믿었던 사람이 내 비밀을 누설', choices:[
-    { type:'BugFix',  text:'관련 기록 삭제, 대화 차단.' },
-    { type:'Hotfix',  text:'배신자에게 즉각 메시지 전송.' },
-    { type:'Feature', text:'배신 경험을 새로운 관계 서사로 전환.' },
-    { type:'Nerf',    text:'신뢰 알고리즘 붕괴, 자기혐오 강화.' }
+  { id:'D27', title:'Privilege Revoked: 신뢰하던 사람의 배신', choices:[
+    { type:'BugFix',  text:'관련 모든 채널 차단, 존재 자체 삭제.' },
+    { type:'Hotfix',  text:'제3자를 통해 우회 확인 시도.' },
+    { type:'Feature', text:'직접 만나 무엇이 있었는지 묻기.' },
+    { type:'Nerf',    text:'"사람을 믿은 내가 바보다" 신뢰 회로 차단.' }
   ]},
-  { id:'D28', title:'Health Crash: 갑작스러운 공황 발작, 호흡 불능', choices:[
-    { type:'BugFix',  text:'증상 부인, 사건 로그 삭제.' },
-    { type:'Hotfix',  text:'심호흡·진정제 투여로 임시 봉합.' },
-    { type:'Feature', text:'치료·상담을 통한 장기적 시스템 업데이트.' },
-    { type:'Nerf',    text:'신체 시스템 신뢰도 붕괴, 무력화 루프 진입.' }
+  { id:'D28', title:'Hard Reset: 모든 것을 그만두고 떠나고 싶음', choices:[
+    { type:'BugFix',  text:'비행기표 검색 후 모든 알림 끄기.' },
+    { type:'Hotfix',  text:'주말 단기 여행으로 임시 거리 두기.' },
+    { type:'Feature', text:'"왜 지금 떠나고 싶은지" 차분히 글로 정리.' },
+    { type:'Nerf',    text:'도망치고 싶은 자신을 비겁하다 평가.' }
   ]},
-  { id:'D29', title:'Terminal Error: 중요한 사람 앞에서 돌이킬 수 없는 말 발화', choices:[
-    { type:'BugFix',  text:'대화 기록 삭제, 발화 은폐.' },
-    { type:'Hotfix',  text:'농담으로 포장.' },
-    { type:'Feature', text:'솔직히 사과하고 관계 재협상 시도.' },
-    { type:'Nerf',    text:'후회 로그 무한 반복, 자기 존재 가치 급락.' }
+  { id:'D29', title:'Total Failure: 나라는 사람이 통째로 잘못된 것 같음', choices:[
+    { type:'BugFix',  text:'거울, SNS, 사람 만남 전부 회피.' },
+    { type:'Hotfix',  text:'쇼핑, 폭식, 폭음 등 강한 자극으로 덮기.' },
+    { type:'Feature', text:'신뢰하는 사람에게 "내가 좀 무너졌다"고 말하기.' },
+    { type:'Nerf',    text:'"역시 나는 안 된다" 결론 고정, 일상 정지.' }
   ]},
   { id:'D30', title:'Final Crash: 가장 가까운 사람의 죽음을 목격', choices:[
     { type:'BugFix',  text:'기억 억제, 장면 삭제 시도.' },
@@ -980,17 +986,18 @@ const DAYS = [
     { type:'Feature', text:'질문 자체를 시스템 핵심 업데이트로 채택, 삶의 방향성을 재설계.' },
     { type:'Nerf',    text:'감정 엔진 붕괴, 삶의 동력 로그 소실.' }
   ]},
-  { id:'D?', title:'Existential Error: "내가 왜 여기 있는가"라는 질문에서 탈출 불가', choices:[
-    { type:'BugFix',  text:'철학적 질문 루프 무시, 일상 태스크로 복귀.' },
-    { type:'Hotfix',  text:'자기 합리화 서브루틴 실행.' },
-    { type:'Feature', text:'질문 자체를 시스템 핵심 업데이트로 채택, 삶의 방향성을 재설계.' },
-    { type:'Nerf',    text:'자기 존재 알고리즘 무한 루프, 정체성 충돌 심화.' }
+  // D? — 존재론적 질문
+  { id:'D?', title:'Existential Error: "내가 살아있는 게 이 사람들에게 의미가 있을까"', choices:[
+    { type:'BugFix',  text:'질문 자체를 회피, 일상 태스크로 강제 복귀.' },
+    { type:'Hotfix',  text:'"다들 그렇게 산다"는 합리화로 임시 봉합.' },
+    { type:'Feature', text:'질문을 안고 살아가는 법을 천천히 탐구.' },
+    { type:'Nerf',    text:'존재 가치 무한 검토 루프, 자기 부재 시뮬레이션.' }
   ]},
-  { id:'D?', title:'Identity Breakdown: "너는 누구냐"라는 질문에 아무 대답도 불가', choices:[
-    { type:'BugFix',  text:'자기소개 요청 무응답 처리.' },
-    { type:'Hotfix',  text:'준비된 단어 몇 개로 간신히 응답.' },
-    { type:'Feature', text:'자아 혼란 자체를 탐구 모드로 전환.' },
-    { type:'Nerf',    text:'자아 알고리즘 충돌, 시스템 다운.' }
+  { id:'D?', title:'Identity Breakdown: "지금까지 내가 살아온 게 정말 나인가"', choices:[
+    { type:'BugFix',  text:'질문 무시, 기존 역할 그대로 수행.' },
+    { type:'Hotfix',  text:'취미, 옷차림, 관계 일부만 바꿔 갱신 시뮬레이션.' },
+    { type:'Feature', text:'내가 누구인지 처음부터 다시 적어 내려가기.' },
+    { type:'Nerf',    text:'자아 정의 모듈 충돌, 모든 정체성 의심 단계 진입.' }
   ]},
   { id:'D?', title:'Critical Error: 화장실에서 울음', choices:[
     { type:'BugFix',  text:'눈가 붉은 로그 삭제. 더 이상 오류 메세지 없음.' },
