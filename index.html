@@ -1411,27 +1411,44 @@ function playDQuestionSequence(onComplete) {
 /* =========================================================
    End Log 영상 — PDF 23페이지 1안 그대로
    ========================================================= */
-const END_LOG_LINES = [
-  { time:'00:00:03', text:'system.out.println("끝났다고 생각했지만, 사실 아직 시작도 하지 않았다");' },
-  { time:'00:00:06', text:'log.info("모든 선택은 잠정적이다. 결과는 닫히지 않고 흘러간다");' },
-  { time:'00:00:09', text:'debug.trace("누군가에겐 Bug Fix가, 또 다른 누군가에겐 Nerf가 된다");' },
-  { time:'00:00:12', text:'system.out.println("나는 고쳤다고 믿었는데, 당신은 상처라고 느낄 수 있다");' },
-  { time:'00:00:15', text:'warning: 게임은 종료되었지만, 삶의 패치는 계속된다', cls:'warning' },
-  { time:'00:00:18', text:'update.check("결과는 확정이 아니라, 또 다른 선택의 서막이다");' },
-  { time:'00:00:22', text:'patch.log("Bug Fix, Hotfix, Feature, Nerf… 어떤 이름을 붙여도 결국 열린 가능성일 뿐이다");' },
-  { time:'00:00:26', text:'system.out.println("엔딩 크레딧은 흘러가지만, 내일의 로그는 이미 작성 중이다");' },
-  { time:'00:00:30', text:'error: 결국, 좋음과 나쁨은 끝나지 않는 업데이트처럼 겹쳐진다', cls:'error' },
-  { time:'00:00:34', text:'reboot.sequence("다시 시작할 수 없다 해도, 이미 또 다른 시작 속에 있다");' },
-  { time:'00:00:37', text:'log.info("선택은 저장되었지만, 결과는 여전히 미결 상태다");' },
-  { time:'00:00:40', text:'system.out.println("모든 갈래는 동시에 열려 있다");' },
-  { time:'00:00:44', text:'debug.trace("확정된 결말은 없다. 오직 임시 저장뿐이다");' },
-  { time:'00:00:47', text:'update.check("패치 이후에도 버그는 다른 모습으로 남아 있다");' },
-  { time:'00:00:50', text:'warning: 예상치 못한 입력값이 감지됨 — 삶은 계속된다', cls:'warning' },
-  { time:'00:00:53', text:'system.out.println("이기는 것도 패배하는 것도 단지 로그의 한 줄이다");' },
-  { time:'00:00:56', text:'error: 해답 없음. 단지 또 다른 질문만 남음', cls:'error' },
-  { time:'00:01:00', text:'patch.log("Hotfix는 안정성을 주었지만, 동시에 균열도 만들었다");' },
-  { time:'00:01:04', text:'system.out.println("삶은 실행 중이다. 중단 명령어는 없다");' }
-];
+// End Log 텍스트 — 사용자의 선택 횟수를 반영하여 매번 동적으로 생성
+function buildEndLogLines() {
+  // 4가지 유형 횟수 집계
+  const counts = { BugFix: 0, Hotfix: 0, Feature: 0, Nerf: 0 };
+  chosenColors.forEach(hex => {
+    if (hex === COLORS.BugFix)  counts.BugFix++;
+    else if (hex === COLORS.Hotfix)  counts.Hotfix++;
+    else if (hex === COLORS.Feature) counts.Feature++;
+    else if (hex === COLORS.Nerf)    counts.Nerf++;
+  });
+  const total = chosenColors.length;
+
+  return [
+    { time:'00:00:00', text:`patch session: ${total} / ${total} — terminated.` },
+    { time:'00:00:05', text:`당신은 ${total}번 선택했습니다.` },
+    { time:'00:00:09', text:`Bug Fix ${counts.BugFix}회 · Hotfix ${counts.Hotfix}회 · Feature ${counts.Feature}회 · Nerf ${counts.Nerf}회.` },
+    { time:'00:00:17', text:`당신은 ${counts.BugFix}번 '없던 일'로 만들었습니다.` },
+    { time:'00:00:21', text:`당신은 ${counts.Hotfix}번 임시로 봉합했습니다.` },
+    { time:'00:00:25', text:`당신은 ${counts.Feature}번 변화를 시도했습니다.` },
+    { time:'00:00:29', text:`당신은 ${counts.Nerf}번 자신을 약하게 만들었습니다.` },
+    { time:'00:00:37', text:`우리는 일상에서 '업데이트'와 같은 기술 용어로` },
+    { time:'00:00:41', text:`자신의 상황을 설명한다.` },
+    { time:'00:00:46', text:`감정, 관계, 심지어 자아마저` },
+    { time:'00:00:50', text:`효율과 최적화를 중심으로 작동한다.` },
+    { time:'00:00:58', text:`감정이 데이터로 환원되는 순간` },
+    { time:'00:01:02', text:`그것은 예측 가능해지지만` },
+    { time:'00:01:06', text:`동시에 생명력을 잃는다.` },
+    { time:'00:01:14', text:`30번의 선택은 단일한 결말로 수렴하지 않는다.` },
+    { time:'00:01:19', text:`같은 선택도 맥락에 따라 전혀 다른 의미로 작동한다.` },
+    { time:'00:01:27', text:`끝났다고 생각했지만,` },
+    { time:'00:01:31', text:`사실 아직 시작도 하지 않았다.` },
+    { time:'00:01:38', text:`같은 버그는 내일도 떠오를 것이다.` },
+    { time:'00:01:42', text:`당신은 다시 [1] [2] [3] [4] 중 하나를 누를 것이다.` },
+    { time:'00:01:48', text:`당신의 패치는 종료되었습니다.` },
+    { time:'00:01:52', text:`그러나 시스템은 종료되지 않았습니다.`, cls:'warning' },
+    { time:'00:01:58', text:`>> next session loading...` }
+  ];
+}
 
 let endLogActive = false;
 let endLogSkipHandler = null;
@@ -1448,7 +1465,10 @@ function playEndLog(onComplete) {
   $endlogBody.innerHTML = '';
   $endlog.classList.remove('hidden');
 
-  const TYPE_SPEED = 35;          // 글자 타이핑 속도 (ms)
+  // 사용자의 선택 횟수에 기반한 End Log 데이터 동적 생성
+  const END_LOG_LINES = buildEndLogLines();
+
+  const TYPE_SPEED = 20;          // 글자 타이핑 속도 (ms) — 빠른 버전
   const LOOP_GAP = 2000;          // 한 사이클 끝난 후 다음 사이클까지 (ms)
   const MAX_VISIBLE_LINES = 14;   // 화면에 동시에 보일 수 있는 최대 줄 수
 
@@ -1728,6 +1748,14 @@ document.addEventListener('keydown', (e) => {
     $intro.classList.add('hidden');
     $introSubtitle.classList.add('hidden');
     $introHint.classList.add('hidden');
+    // 테스트용: chosenColors가 비어 있으면 임의의 데이터로 채움
+    if (chosenColors.length === 0) {
+      const colorTypes = ['BugFix', 'Hotfix', 'Feature', 'Nerf'];
+      for (let i = 0; i < 33; i++) {
+        const randomType = colorTypes[Math.floor(Math.random() * 4)];
+        chosenColors.push(COLORS[randomType]);
+      }
+    }
     playEndLog(() => startIntro());
     return;
   }
